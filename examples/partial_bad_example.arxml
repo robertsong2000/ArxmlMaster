@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0">
+  <AR-PACKAGES>
+    <!-- 这个包结构正确 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>GoodPackage</SHORT-NAME>
+      <ELEMENTS>
+        <SYSTEM>
+          <SHORT-NAME>GoodSystem</SHORT-NAME>
+          <CATEGORY>SYSTEM</CATEGORY>
+        </SYSTEM>
+      </ELEMENTS>
+    </AR-PACKAGE>
+    
+    <!-- 这个包包含额外的未定义元素，但结构基本正确 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>PackageWithExtraElements</SHORT-NAME>
+      <ELEMENTS>
+        <SYSTEM>
+          <SHORT-NAME>SystemWithExtra</SHORT-NAME>
+          <CATEGORY>SYSTEM</CATEGORY>
+          <!-- 额外的元素，Go 的 XML 解析器会忽略 -->
+          <EXTRA-ELEMENT>Extra content</EXTRA-ELEMENT>
+          <ANOTHER-EXTRA>More extra</ANOTHER-EXTRA>
+        </SYSTEM>
+      </ELEMENTS>
+      <!-- 包级别的额外元素 -->
+      <EXTRA-PACKAGE-ELEMENT>Package extra</EXTRA-PACKAGE-ELEMENT>
+    </AR-PACKAGE>
+    
+    <!-- 缺少 CATEGORY 元素，但其他部分正确 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>PackageMissingCategory</SHORT-NAME>
+      <ELEMENTS>
+        <ECU-INSTANCE>
+          <SHORT-NAME>ECUWithoutCategory</SHORT-NAME>
+          <!-- CATEGORY 元素缺失 -->
+        </ECU-INSTANCE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+</AUTOSAR>

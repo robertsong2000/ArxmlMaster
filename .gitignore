@@ -1,0 +1,122 @@
+# Go 编译产物
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+arxml-validator
+main
+test
+
+# Go 模块缓存
+go.sum
+
+# Go 工作区文件
+go.work
+go.work.sum
+
+# IDE 和编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS 系统文件
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows 系统文件
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux 系统文件
+*~
+
+# 临时文件
+*.tmp
+*.temp
+*.log
+*.out
+*.pid
+*.seed
+*.pid.lock
+
+# 测试和覆盖率文件
+*.test
+*.prof
+coverage.txt
+coverage.html
+coverage.out
+
+# 构建输出目录
+bin/
+build/
+dist/
+output/
+
+# 依赖目录
+vendor/
+
+# 文档生成文件
+docs/_build/
+docs/site/
+
+# 备份文件
+*.bak
+*.backup
+*.old
+*.orig
+
+# 压缩文件
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# 配置文件（可能包含敏感信息）
+config.json
+secrets.json
+.env
+.env.local
+.env.*.local
+
+# 调试文件
+debug
+debug.exe
+core
+core.*
+
+# 性能分析文件
+*.prof
+*.pprof
+*.trace
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 本地开发文件
+local/
+tmp/
+temp/
+workspace/
+
+# 日志文件
+logs/
+*.log
+
+# ARXML 处理的中间文件
+*_processed.arxml
+*_validated.arxml
+validation_report.json
+test_output/
+
+# 示例测试输出
+test_results/
+validation_output/

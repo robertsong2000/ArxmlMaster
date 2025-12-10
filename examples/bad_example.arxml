@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 这个文件包含各种错误来测试解析器的错误处理能力 -->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0">
+  <!-- 缺少闭合标签 -->
+  <AR-PACKAGES>
+    <AR-PACKAGE>
+      <SHORT-NAME>BadPackage
+      <!-- SHORT-NAME 标签没有闭合 -->
+      <ELEMENTS>
+        <SYSTEM>
+          <SHORT-NAME>BadSystem</SHORT-NAME>
+          <!-- 未定义的元素 -->
+          <UNDEFINED-ELEMENT>Some content</UNDEFINED-ELEMENT>
+          <CATEGORY>SYSTEM</CATEGORY>
+        </SYSTEM>
+      </ELEMENTS>
+    </AR-PACKAGE>
+    
+    <!-- 缺少必需的 SHORT-NAME -->
+    <AR-PACKAGE>
+      <ELEMENTS>
+        <ECU-INSTANCE>
+          <CATEGORY>ECU</CATEGORY>
+        </ECU-INSTANCE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+    
+    <!-- XML 结构错误 - 标签不匹配 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>MismatchedPackage</SHORT-NAME>
+      <ELEMENTS>
+        <ECU-INSTANCE>
+          <SHORT-NAME>TestECU</SHORT-NAME>
+          <CATEGORY>ECU</CATEGORY>
+        <!-- 错误的闭合标签 -->
+        </SYSTEM>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+<!-- 缺少 AUTOSAR 闭合标签 -->

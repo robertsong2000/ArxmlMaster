@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  包含常见 AUTOSAR 错误的示例文件
+  用于测试验证器的错误检测能力
+-->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0">
+  <!-- 错误1: 缺少必需的 S 属性（命名空间） -->
+  <!-- 错误2: 缺少 T 属性（时间戳） -->
+
+  <AR-PACKAGES>
+    <!-- 错误3: AR-PACKAGE 包含数字开头的 SHORT-NAME -->
+    <AR-PACKAGE>
+      <SHORT-NAME>123InvalidPackage</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 错误4: 无效的数据类型名（包含特殊字符） -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>Speed-Type@Invalid</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <!-- 错误5: 缺少必需的 SW-DATA-DEF-PROPS 元素 -->
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 错误6: 缺少 SHORT-NAME 的元素 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <!-- 错误7: 无效的基础类型引用 -->
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/NonExistentType</BASE-TYPE-REF>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 错误8: 空的 SHORT-NAME -->
+    <AR-PACKAGE>
+      <SHORT-NAME></SHORT-NAME>
+      <ELEMENTS>
+        <!-- 错误9: 系统缺少必需的 COMPONENTS 元素 -->
+        <SYSTEM>
+          <SHORT-NAME>InvalidSystem</SHORT-NAME>
+          <!-- 缺少 COMPONENTS -->
+          <CATEGORY>SYSTEM</CATEGORY>
+        </SYSTEM>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 错误10: 重复的 SHORT-NAME（虽然在 XML 中有效，但在实际应用中可能造成问题） -->
+    <AR-PACKAGE>
+      <SHORT-NAME>DuplicatePackage</SHORT-NAME>
+      <ELEMENTS>
+        <SYSTEM>
+          <SHORT-NAME>DuplicateSystem</SHORT-NAME>
+          <CATEGORY>SYSTEM</CATEGORY>
+          <COMPONENTS>
+            <!-- 错误11: 组件引用缺少必需的 Dest 属性 -->
+            <COMPONENT-REF>
+              <SHORT-NAME>SomeComponent</SHORT-NAME>
+            </COMPONENT-REF>
+          </COMPONENTS>
+        </SYSTEM>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 错误12: 另一个重复的包名 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>DuplicatePackage</SHORT-NAME>
+      <ELEMENTS>
+        <SYSTEM>
+          <SHORT-NAME>AnotherSystem</SHORT-NAME>
+          <CATEGORY>SYSTEM</CATEGORY>
+        </SYSTEM>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 错误13: 包含无效字符的 SHORT-NAME -->
+    <AR-PACKAGE>
+      <SHORT-NAME>Package$Invalid%Chars</SHORT-NAME>
+      <ELEMENTS>
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>SWC_With@Invalid#Name</SHORT-NAME>
+          <!-- 错误14: 软件组件缺少 PORTS 元素 -->
+          <INTERNAL-BEHAVIORS>
+            <SWC-IMPLEMENTATION>
+              <SHORT-NAME>SomeImplementation</SHORT-NAME>
+              <!-- 错误15: BEHAVIOR-REF 引用不存在的元素 -->
+              <BEHAVIOR-REF DEST="SWC-INTERNAL-BEHAVIOR">/NonExistent/Behavior</BEHAVIOR-REF>
+            </SWC-IMPLEMENTATION>
+          </INTERNAL-BEHAVIORS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+
+<!-- 错误16: 缺少闭合的 AUTOSAR 标签 -->
+</AUTOSAR>

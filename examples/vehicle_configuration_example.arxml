@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  汽车配置相关的 AUTOSAR 示例
+  包含车身控制、动力总成和底盘系统配置
+-->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0" S="R4.0.3" T="2024-01-20T14:45:30Z">
+  <AR-PACKAGES>
+    <!-- 车辆数据类型包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>VehicleDataTypes</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 车速数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>VehicleSpeed_kmh</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/VehicleDataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">350</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 发动机转速数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>EngineRPM</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/VehicleDataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">8000</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 油门踏板位置数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>AcceleratorPedalPosition</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/VehicleDataTypes/SwBaseTypes/uint8</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">100</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 制动压力数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>BrakePressure</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/VehicleDataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">1000</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 转向角度数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>SteeringAngle</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/VehicleDataTypes/SwBaseTypes/int16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">-720</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">720</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 布尔数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>BooleanType</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/VehicleDataTypes/SwBaseTypes/boolean</BASE-TYPE-REF>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 发动机温度数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>EngineTemperature</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/VehicleDataTypes/SwBaseTypes/int16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>20</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">-40</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">150</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 燃油液位数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>FuelLevel</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/VehicleDataTypes/SwBaseTypes/uint8</BASE-TYPE-REF>
+                <SW-VALUE-CONT>50</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">100</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- ECU 配置包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>VehicleECUConfiguration</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 发动机控制模块 ECU -->
+        <ECU-INSTANCE>
+          <SHORT-NAME>ECM_ECU</SHORT-NAME>
+          <CATEGORY>ECU</CATEGORY>
+          <ADMIN-DATA>
+            <DOC-REVISIONS>
+              <DOC-REVISION>
+                <REVISION-LABEL>1.0</REVISION-LABEL>
+                <CREATED>2024-01-20T14:45:30Z</CREATED>
+                <MODIFIED>2024-01-20T14:45:30Z</MODIFIED>
+              </DOC-REVISION>
+            </DOC-REVISIONS>
+          </ADMIN-DATA>
+        </ECU-INSTANCE>
+
+        <!-- 制动控制模块 ECU -->
+        <ECU-INSTANCE>
+          <SHORT-NAME>BCM_ECU</SHORT-NAME>
+          <CATEGORY>ECU</CATEGORY>
+        </ECU-INSTANCE>
+
+        <!-- 车身控制模块 ECU -->
+        <ECU-INSTANCE>
+          <SHORT-NAME>BRM_ECU</SHORT-NAME>
+          <CATEGORY>ECU</CATEGORY>
+        </ECU-INSTANCE>
+
+        <!-- 仪表盘 ECU -->
+        <ECU-INSTANCE>
+          <SHORT-NAME>ICM_ECU</SHORT-NAME>
+          <CATEGORY>ECU</CATEGORY>
+        </ECU-INSTANCE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 车辆系统包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>VehicleSystems</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 完整车辆系统 -->
+        <SYSTEM>
+          <SHORT-NAME>CompleteVehicleSystem</SHORT-NAME>
+          <CATEGORY>SYSTEM</CATEGORY>
+          <ADMIN-DATA>
+            <DOC-REVISIONS>
+              <DOC-REVISION>
+                <REVISION-LABEL>1.0</REVISION-LABEL>
+                <CREATED>2024-01-20T14:45:30Z</CREATED>
+                <MODIFIED>2024-01-20T14:45:30Z</MODIFIED>
+              </DOC-REVISION>
+            </DOC-REVISIONS>
+          </ADMIN-DATA>
+          <COMPONENTS>
+            <!-- 发动机管理软件组件 -->
+            <COMPONENT-REF DEST="APPLICATION-SOFTWARE-COMPONENT">
+              <SHORT-NAME>EngineManagementSWC</SHORT-NAME>
+            </COMPONENT-REF>
+
+            <!-- 制动控制软件组件 -->
+            <COMPONENT-REF DEST="APPLICATION-SOFTWARE-COMPONENT">
+              <SHORT-NAME>BrakeControlSWC</SHORT-NAME>
+            </COMPONENT-REF>
+
+            <!-- 车身控制软件组件 -->
+            <COMPONENT-REF DEST="APPLICATION-SOFTWARE-COMPONENT">
+              <SHORT-NAME>BodyControlSWC</SHORT-NAME>
+            </COMPONENT-REF>
+
+            <!-- 仪表盘软件组件 -->
+            <COMPONENT-REF DEST="APPLICATION-SOFTWARE-COMPONENT">
+              <SHORT-NAME>InstrumentClusterSWC</SHORT-NAME>
+            </COMPONENT-REF>
+          </COMPONENTS>
+        </SYSTEM>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 系统映射包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>VehicleMappings</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 车辆系统映射 -->
+        <SYSTEM-MAPPING>
+          <SHORT-NAME>VehicleSystemMapping</SHORT-NAME>
+          <SYSTEM-REF DEST="SYSTEM">/VehicleSystems/CompleteVehicleSystem</SYSTEM-REF>
+          <SWC-TO-ECU-MAPPINGS>
+            <!-- 发动机管理映射到 ECM -->
+            <SWC-TO-ECU-MAPPING>
+              <SHORT-NAME>EngineManagementMapping</SHORT-NAME>
+              <SWC-INSTANCE-REF DEST="APPLICATION-SOFTWARE-COMPONENT">/SoftwareComponents/EngineManagementSWC</SWC-INSTANCE-REF>
+              <ECU-INSTANCE-REF DEST="ECU-INSTANCE">/VehicleECUConfiguration/ECM_ECU</ECU-INSTANCE-REF>
+            </SWC-TO-ECU-MAPPING>
+
+            <!-- 制动控制映射到 BCM -->
+            <SWC-TO-ECU-MAPPING>
+              <SHORT-NAME>BrakeControlMapping</SHORT-NAME>
+              <SWC-INSTANCE-REF DEST="APPLICATION-SOFTWARE-COMPONENT">/SoftwareComponents/BrakeControlSWC</SWC-INSTANCE-REF>
+              <ECU-INSTANCE-REF DEST="ECU-INSTANCE">/VehicleECUConfiguration/BCM_ECU</ECU-INSTANCE-REF>
+            </SWC-TO-ECU-MAPPING>
+
+            <!-- 车身控制映射到 BRM -->
+            <SWC-TO-ECU-MAPPING>
+              <SHORT-NAME>BodyControlMapping</SHORT-NAME>
+              <SWC-INSTANCE-REF DEST="APPLICATION-SOFTWARE-COMPONENT">/SoftwareComponents/BodyControlSWC</SWC-INSTANCE-REF>
+              <ECU-INSTANCE-REF DEST="ECU-INSTANCE">/VehicleECUConfiguration/BRM_ECU</ECU-INSTANCE-REF>
+            </SWC-TO-ECU-MAPPING>
+
+            <!-- 仪表盘映射到 ICM -->
+            <SWC-TO-ECU-MAPPING>
+              <SHORT-NAME>InstrumentClusterMapping</SHORT-NAME>
+              <SWC-INSTANCE-REF DEST="APPLICATION-SOFTWARE-COMPONENT">/SoftwareComponents/InstrumentClusterSWC</SWC-INSTANCE-REF>
+              <ECU-INSTANCE-REF DEST="ECU-INSTANCE">/VehicleECUConfiguration/ICM_ECU</ECU-INSTANCE-REF>
+            </SWC-TO-ECU-MAPPING>
+          </SWC-TO-ECU-MAPPINGS>
+        </SYSTEM-MAPPING>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 应用定时事件包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>ApplicationTiming</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 发动机数据采样定时器 -->
+        <APPLICATION-INTERVAL>
+          <SHORT-NAME>EngineDataSamplingInterval</SHORT-NAME>
+          <INTERVAL-EVENT>
+            <INTERVAL-EVENT>
+              <SHORT-NAME>EngineDataSamplingEvent</SHORT-NAME>
+              <PERIOD>10000</PERIOD>
+              <START-ON-EVENT-REF DEST="MODE-DECLARATION-GROUP-PROTOTYPE">/ApplicationTiming/EngineMode/EngineRunningMode</START-ON-EVENT-REF>
+            </INTERVAL-EVENT>
+          </INTERVAL-EVENT>
+        </APPLICATION-INTERVAL>
+
+        <!-- 车速采样定时器 -->
+        <APPLICATION-INTERVAL>
+          <SHORT-NAME>VehicleSpeedSamplingInterval</SHORT-NAME>
+          <INTERVAL-EVENT>
+            <INTERVAL-EVENT>
+              <SHORT-NAME>VehicleSpeedSamplingEvent</SHORT-NAME>
+              <PERIOD>5000</PERIOD>
+            </INTERVAL-EVENT>
+          </INTERVAL-EVENT>
+        </APPLICATION-INTERVAL>
+
+        <!-- 制动数据采样定时器 -->
+        <APPLICATION-INTERVAL>
+          <SHORT-NAME>BrakeDataSamplingInterval</SHORT-NAME>
+          <INTERVAL-EVENT>
+            <INTERVAL-EVENT>
+              <SHORT-NAME>BrakeDataSamplingEvent</SHORT-NAME>
+              <PERIOD>2000</PERIOD>
+            </INTERVAL-EVENT>
+          </INTERVAL-EVENT>
+        </APPLICATION-INTERVAL>
+
+        <!-- 发动机模式声明组 -->
+        <MODE-DECLARATION-GROUP>
+          <SHORT-NAME>EngineMode</SHORT-NAME>
+          <MODE-DECLARATIONS>
+            <MODE-DECLARATION>
+              <SHORT-NAME>EngineRunningMode</SHORT-NAME>
+            </MODE-DECLARATION>
+            <MODE-DECLARATION>
+              <SHORT-NAME>EngineStoppedMode</SHORT-NAME>
+            </MODE-DECLARATION>
+          </MODE-DECLARATIONS>
+        </MODE-DECLARATION-GROUP>
+
+        <!-- 发动机模式组原型 -->
+        <MODE-DECLARATION-GROUP-PROTOTYPE>
+          <SHORT-NAME>EngineRunningMode</SHORT-NAME>
+          <TYPE-TREF DEST="MODE-DECLARATION-GROUP">/ApplicationTiming/EngineMode</TYPE-TREF>
+        </MODE-DECLARATION-GROUP-PROTOTYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+</AUTOSAR>

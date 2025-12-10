@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <AR-PACKAGES>
+    <!-- Data Types Package -->
+    <AR-PACKAGE>
+      <SHORT-NAME>DataTypes</SHORT-NAME>
+      <ELEMENTS>
+        <!-- Vehicle Speed Data Type -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>VehicleSpeed_kmh</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/DataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">350</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- Engine RPM Data Type -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>EngineRPM</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/DataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">8000</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- Boolean Data Type -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>BooleanType</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/DataTypes/SwBaseTypes/boolean</BASE-TYPE-REF>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- Base Types -->
+        <SW-BASE-TYPE>
+          <SHORT-NAME>uint8</SHORT-NAME>
+          <CATEGORY>FIXED_LENGTH</CATEGORY>
+          <BASE-TYPE-SIZE BYTE-SIZE="1" />
+        </SW-BASE-TYPE>
+
+        <SW-BASE-TYPE>
+          <SHORT-NAME>uint16</SHORT-NAME>
+          <CATEGORY>FIXED_LENGTH</CATEGORY>
+          <BASE-TYPE-SIZE BYTE-SIZE="2" />
+        </SW-BASE-TYPE>
+
+        <SW-BASE-TYPE>
+          <SHORT-NAME>boolean</SHORT-NAME>
+          <CATEGORY>FIXED_LENGTH</CATEGORY>
+          <BASE-TYPE-SIZE BYTE-SIZE="1" />
+        </SW-BASE-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- Vehicle Interfaces Package -->
+    <AR-PACKAGE>
+      <SHORT-NAME>VehicleInterfaces</SHORT-NAME>
+      <ELEMENTS>
+        <!-- Vehicle Information Interface -->
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>IVehicleInfo</SHORT-NAME>
+          <IS-SERVICE>false</IS-SERVICE>
+          <DATA-ELEMENTS>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>Speed_kmh</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/DataTypes/VehicleSpeed_kmh</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>EngineRPM</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/DataTypes/EngineRPM</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>EngineRunning</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/DataTypes/BooleanType</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+          </DATA-ELEMENTS>
+        </SENDER-RECEIVER-INTERFACE>
+
+        <!-- Control Interface -->
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>IVehicleControl</SHORT-NAME>
+          <IS-SERVICE>false</IS-SERVICE>
+          <DATA-ELEMENTS>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>ThrottlePosition</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/DataTypes/VehicleSpeed_kmh</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>BrakePedalPressed</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/DataTypes/BooleanType</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+          </DATA-ELEMENTS>
+        </SENDER-RECEIVER-INTERFACE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- ECU Configuration Package -->
+    <AR-PACKAGE>
+      <SHORT-NAME>ECU_Configuration</SHORT-NAME>
+      <ELEMENTS>
+        <!-- Engine Control Unit -->
+        <ECU-INSTANCE>
+          <SHORT-NAME>EngineECU</SHORT-NAME>
+          <ADMIN-DATA>
+            <DOC-REVISIONS>
+              <DOC-REVISION>
+                <REVISION>1.0</REVISION>
+                <CREATED>
+                  <DATE>2024-01-01T00:00:00Z</DATE>
+                  <CREATED-BY>SystemDesigner</CREATED-BY>
+                </CREATED>
+                <CHANGE-DESC>
+                  <CONTENT>Initial version</CONTENT>
+                </CHANGE-DESC>
+              </DOC-REVISION>
+            </DOC-REVISIONS>
+          </ADMIN-DATA>
+          <ECU-CONFIGURATION-REFS>
+            <ECU-CONFIGURATION-REF DEST="ECU-CONFIGURATION">/ECU_Configuration/EngineECU_Config</ECU-CONFIGURATION-REF>
+          </ECU-CONFIGURATION-REFS>
+        </ECU-INSTANCE>
+
+        <!-- Engine ECU Configuration -->
+        <ECU-CONFIGURATION>
+          <SHORT-NAME>EngineECU_Config</SHORT-NAME>
+          <CONNECTOR-REFS>
+            <CONNECTOR-REF DEST="APPLICATION-SOFTWARE-CLUSTER-CONNECTOR">
+              /ECU_Configuration/EngineAppClusterConnector
+            </CONNECTOR-REF>
+          </CONNECTOR-REFS>
+          <DIAGNOSTIC-ADDRESS>0x710</DIAGNOSTIC-ADDRESS>
+          <CHANNELS>
+            <CAN-CHANNEL>
+              <SHORT-NAME>EngineCAN</SHORT-NAME>
+              <NETWORK-REPRESENTATION>
+                <PHYSICAL-CHANNEL-REF DEST="PHYSICAL-CAN-CHANNEL">/Network/CAN_PhysicalChannels/EngineCAN</PHYSICAL-CHANNEL-REF>
+              </NETWORK-REPRESENTATION>
+              <FRAME-TRIGGERINGS>
+                <FRAME-TRIGGERING>
+                  <SHORT-NAME>EngineStatusFrame</SHORT-NAME>
+                  <FRAME-REF DEST="CAN-FRAME">/Network/CAN_Frames/EngineStatus</FRAME-REF>
+                  <PORT-REFS>
+                    <PORT-REF DEST="SENDER-RECEIVER-PORT">/Components/EngineControl/EngineInfoPort</PORT-REF>
+                  </PORT-REFS>
+                </FRAME-TRIGGERING>
+              </FRAME-TRIGGERINGS>
+            </CAN-CHANNEL>
+          </CHANNELS>
+        </ECU-CONFIGURATION>
+
+        <!-- Application Software Cluster Connector -->
+        <APPLICATION-SOFTWARE-CLUSTER-CONNECTOR>
+          <SHORT-NAME>EngineAppClusterConnector</SHORT-NAME>
+          <APPLICATION-SOFTWARE-CLUSTER-REF DEST="APPLICATION-SOFTWARE-CLUSTER">
+            /Components/EngineSoftwareCluster
+          </APPLICATION-SOFTWARE-CLUSTER-REF>
+        </APPLICATION-SOFTWARE-CLUSTER-CONNECTOR>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- Components Package -->
+    <AR-PACKAGE>
+      <SHORT-NAME>Components</SHORT-NAME>
+      <ELEMENTS>
+        <!-- Engine Control Component -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>EngineControlSWC</SHORT-NAME>
+          <PORTS>
+            <!-- Sender-Receiver Port for vehicle information -->
+            <SENDER-RECEIVER-PORT>
+              <SHORT-NAME>EngineInfoPort</SHORT-NAME>
+              <PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/VehicleInterfaces/IVehicleInfo</PROVIDED-INTERFACE-TREF>
+              <DATA-ELEMENTS>
+                <VARIABLE-DATA-PROTOTYPE-REF DEST="VARIABLE-DATA-PROTOTYPE">
+                  /VehicleInterfaces/IVehicleInfo/Speed_kmh
+                </VARIABLE-DATA-PROTOTYPE-REF>
+                <VARIABLE-DATA-PROTOTYPE-REF DEST="VARIABLE-DATA-PROTOTYPE">
+                  /VehicleInterfaces/IVehicleInfo/EngineRPM
+                </VARIABLE-DATA-PROTOTYPE-REF>
+                <VARIABLE-DATA-PROTOTYPE-REF DEST="VARIABLE-DATA-PROTOTYPE">
+                  /VehicleInterfaces/IVehicleInfo/EngineRunning
+                </VARIABLE-DATA-PROTOTYPE-REF>
+              </DATA-ELEMENTS>
+            </SENDER-RECEIVER-PORT>
+
+            <!-- Sender-Receiver Port for control -->
+            <SENDER-RECEIVER-PORT>
+              <SHORT-NAME>ControlPort</SHORT-NAME>
+              <REQUIRED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/VehicleInterfaces/IVehicleControl</REQUIRED-INTERFACE-TREF>
+              <DATA-ELEMENTS>
+                <VARIABLE-DATA-PROTOTYPE-REF DEST="VARIABLE-DATA-PROTOTYPE">
+                  /VehicleInterfaces/IVehicleControl/ThrottlePosition
+                </VARIABLE-DATA-PROTOTYPE-REF>
+                <VARIABLE-DATA-PROTOTYPE-REF DEST="VARIABLE-DATA-PROTOTYPE">
+                  /VehicleInterfaces/IVehicleControl/BrakePedalPressed
+                </VARIABLE-DATA-PROTOTYPE-REF>
+              </DATA-ELEMENTS>
+            </SENDER-RECEIVER-PORT>
+          </PORTS>
+          <INTERNAL-BEHAVIORS>
+            <SWC-INTERNAL-BEHAVIOR>
+              <SHORT-NAME>EngineControl_IB</SHORT-NAME>
+              <RUNNABLE-ENTITIES>
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>CalculateEngineStatus</SHORT-NAME>
+                  <SYMBOL>CalculateEngineStatus</SYMBOL>
+                  <CAN-BE-INVOKED-CONCURRENTLY>false</CAN-BE-INVOKED-CONCURRENTLY>
+                </RUNNABLE-ENTITY>
+              </RUNNABLE-ENTITIES>
+            </SWC-INTERNAL-BEHAVIOR>
+          </INTERNAL-BEHAVIORS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+
+        <!-- Software Cluster -->
+        <APPLICATION-SOFTWARE-CLUSTER>
+          <SHORT-NAME>EngineSoftwareCluster</SHORT-NAME>
+          <APPLICATION-SOFTWARE-COMPONENT-TYPE-REFS>
+            <APPLICATION-SOFTWARE-COMPONENT-TYPE-REF DEST="APPLICATION-SOFTWARE-COMPONENT-TYPE">
+              /Components/EngineControlSWC
+            </APPLICATION-SOFTWARE-COMPONENT-TYPE-REF>
+          </APPLICATION-SOFTWARE-COMPONENT-TYPE-REFS>
+        </APPLICATION-SOFTWARE-CLUSTER>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- Network Package -->
+    <AR-PACKAGE>
+      <SHORT-NAME>Network</SHORT-NAME>
+      <ELEMENTS>
+        <!-- CAN Physical Channel -->
+        <PHYSICAL-CAN-CHANNEL>
+          <SHORT-NAME>EngineCAN</SHORT-NAME>
+          <FRAME-TRIGGERINGS>
+            <FRAME-TRIGGERING-REF DEST="FRAME-TRIGGERING">
+              /ECU_Configuration/EngineECU_Config/CAN-CHANNEL-0/FRAME-TRIGGERING-0
+            </FRAME-TRIGGERING-REF>
+          </FRAME-TRIGGERINGS>
+        </PHYSICAL-CAN-CHANNEL>
+
+        <!-- CAN Frame -->
+        <CAN-FRAME>
+          <SHORT-NAME>EngineStatus</SHORT-NAME>
+          <FRAME-LENGTH>8</FRAME-LENGTH>
+          <PDU-MAPPINGS>
+            <PDU-MAPPING>
+              <SHORT-NAME>EngineStatusMapping</SHORT-NAME>
+              <PDU-REF DEST="CAN-I-PDU">/Network/CAN_I_PDU/EngineStatus_PDU</PDU-REF>
+            </PDU-MAPPING>
+          </PDU-MAPPINGS>
+        </CAN-FRAME>
+
+        <!-- CAN I-PDU -->
+        <CAN-I-PDU>
+          <SHORT-NAME>EngineStatus_PDU</SHORT-NAME>
+          <LENGTH>8</LENGTH>
+          <CAN-PAYLOAD-TYPE-REF DEST="CAN-PAYLOAD-TYPE">/Network/CAN_Payload/EngineStatus_Payload</CAN-PAYLOAD-TYPE-REF>
+        </CAN-I-PDU>
+
+        <!-- CAN Payload -->
+        <CAN-PAYLOAD-TYPE>
+          <SHORT-NAME>EngineStatus_Payload</SHORT-NAME>
+          <LENGTH>8</LENGTH>
+          <BYTE-ORDER>MOST-SIGNIFICANT-BYTE-FIRST</BYTE-ORDER>
+        </CAN-PAYLOAD-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+</AUTOSAR>

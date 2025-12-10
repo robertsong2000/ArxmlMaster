@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  通信相关的 AUTOSAR 示例
+  包含 CAN、以太网通信配置和信号定义
+-->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0" S="R4.0.3" T="2024-01-22T09:15:20Z">
+  <AR-PACKAGES>
+    <!-- 通信数据类型包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>CommDataTypes</SHORT-NAME>
+      <ELEMENTS>
+        <!-- CAN 信号数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>CAN_Signal_8bit</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/CommDataTypes/SwBaseTypes/uint8</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">255</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>CAN_Signal_16bit</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/CommDataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">65535</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>CAN_Signal_32bit</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/CommDataTypes/SwBaseTypes/uint32</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">4294967295</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 基础类型 -->
+        <SW-BASE-TYPE>
+          <SHORT-NAME>uint8</SHORT-NAME>
+          <CATEGORY>UNSIGNED_INTEGER</CATEGORY>
+        </SW-BASE-TYPE>
+
+        <SW-BASE-TYPE>
+          <SHORT-NAME>uint16</SHORT-NAME>
+          <CATEGORY>UNSIGNED_INTEGER</CATEGORY>
+        </SW-BASE-TYPE>
+
+        <SW-BASE-TYPE>
+          <SHORT-NAME>uint32</SHORT-NAME>
+          <CATEGORY>UNSIGNED_INTEGER</CATEGORY>
+        </SW-BASE-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- CAN 通信包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>CANCommunication</SHORT-NAME>
+      <ELEMENTS>
+        <!-- CAN 总线网络 -->
+        <CAN-CLUSTER>
+          <SHORT-NAME>VehicleCanNetwork</SHORT-NAME>
+          <CATEGORY>CAN</CATEGORY>
+          <CAN-ADDRESSING-MODE>NORMAL</CAN-ADDRESSING-MODE>
+          <CAN-FRAME-PROCESSINGS>
+            <CAN-FRAME-PROCESSING>
+              <SHORT-NAME>CanFrameProcessing</SHORT-NAME>
+              <CAN-FRAME-TRIGGERINGS>
+                <!-- 发动机数据帧 -->
+                <CAN-FRAME-TRIGGERING>
+                  <SHORT-NAME>EngineDataFrame</SHORT-NAME>
+                  <FRAME-PORT-REFS>
+                    <FRAME-PORT-REF DEST="CAN-FRAME-PORT">/Communication/CANPorts/EngineDataFramePort</FRAME-PORT-REF>
+                  </FRAME-PORT-REFS>
+                  <FRAME-REF DEST="CAN-FRAME">/CANCommunication/CanFrames/EngineDataMessage</FRAME-REF>
+                  <I-PDU-TRIGGERINGS>
+                    <CAN-SIGNAL-I-PDU-TRIGGERING>
+                      <SHORT-NAME>EngineDataIPDU</SHORT-NAME>
+                      <I-SIGNAL-TO-I-PDU-MAPPINGS>
+                        <!-- 发动机转速信号 -->
+                        <I-SIGNAL-TO-I-PDU-MAPPING>
+                          <SHORT-NAME>EngineRPM_Signal</SHORT-NAME>
+                          <I-SIGNAL-REF DEST="I-SIGNAL">/CANCommunication/Signals/EngineRPM_Signal</I-SIGNAL-REF>
+                        </I-SIGNAL-TO-I-PDU-MAPPING>
+                        <!-- 发动机温度信号 -->
+                        <I-SIGNAL-TO-I-PDU-MAPPING>
+                          <SHORT-NAME>EngineTemp_Signal</SHORT-NAME>
+                          <I-SIGNAL-REF DEST="I-SIGNAL">/CANCommunication/Signals/EngineTemp_Signal</I-SIGNAL-REF>
+                        </I-SIGNAL-TO-I-PDU-MAPPING>
+                        <!-- 节气门位置信号 -->
+                        <I-SIGNAL-TO-I-PDU-MAPPING>
+                          <SHORT-NAME>ThrottlePos_Signal</SHORT-NAME>
+                          <I-SIGNAL-REF DEST="I-SIGNAL">/CANCommunication/Signals/ThrottlePos_Signal</I-SIGNAL-REF>
+                        </I-SIGNAL-TO-I-PDU-MAPPING>
+                      </I-SIGNAL-TO-I-PDU-MAPPINGS>
+                    </CAN-SIGNAL-I-PDU-TRIGGERING>
+                  </I-PDU-TRIGGERINGS>
+                </CAN-FRAME-TRIGGERING>
+
+                <!-- 车辆状态帧 -->
+                <CAN-FRAME-TRIGGERING>
+                  <SHORT-NAME>VehicleStatusFrame</SHORT-NAME>
+                  <FRAME-PORT-REFS>
+                    <FRAME-PORT-REF DEST="CAN-FRAME-PORT">/Communication/CANPorts/VehicleStatusFramePort</FRAME-PORT-REF>
+                  </FRAME-PORT-REFS>
+                  <FRAME-REF DEST="CAN-FRAME">/CANCommunication/CanFrames/VehicleStatusMessage</FRAME-REF>
+                  <I-PDU-TRIGGERINGS>
+                    <CAN-SIGNAL-I-PDU-TRIGGERING>
+                      <SHORT-NAME>VehicleStatusIPDU</SHORT-NAME>
+                      <I-SIGNAL-TO-I-PDU-MAPPINGS>
+                        <!-- 车速信号 -->
+                        <I-SIGNAL-TO-I-PDU-MAPPING>
+                          <SHORT-NAME>VehicleSpeed_Signal</SHORT-NAME>
+                          <I-SIGNAL-REF DEST="I-SIGNAL">/CANCommunication/Signals/VehicleSpeed_Signal</I-SIGNAL-REF>
+                        </I-SIGNAL-TO-I-PDU-MAPPING>
+                        <!-- 制动信号 -->
+                        <I-SIGNAL-TO-I-PDU-MAPPING>
+                          <SHORT-NAME>BrakeStatus_Signal</SHORT-NAME>
+                          <I-SIGNAL-REF DEST="I-SIGNAL">/CANCommunication/Signals/BrakeStatus_Signal</I-SIGNAL-REF>
+                        </I-SIGNAL-TO-I-PDU-MAPPING>
+                        <!-- 转向信号 -->
+                        <I-SIGNAL-TO-I-PDU-MAPPING>
+                          <SHORT-NAME>SteeringAngle_Signal</SHORT-NAME>
+                          <I-SIGNAL-REF DEST="I-SIGNAL">/CANCommunication/Signals/SteeringAngle_Signal</I-SIGNAL-REF>
+                        </I-SIGNAL-TO-I-PDU-MAPPING>
+                      </I-SIGNAL-TO-I-PDU-MAPPINGS>
+                    </CAN-SIGNAL-I-PDU-TRIGGERING>
+                  </I-PDU-TRIGGERINGS>
+                </CAN-FRAME-TRIGGERING>
+              </CAN-FRAME-TRIGGERINGS>
+            </CAN-FRAME-PROCESSING>
+          </CAN-FRAME-PROCESSINGS>
+
+          <!-- 物理通道 -->
+          <PHYSICAL-CHANNELS>
+            <CAN-PHYSICAL-CHANNEL>
+              <SHORT-NAME>CanPhysicalChannel1</SHORT-NAME>
+              <FRAME-TRIGGERINGS>
+                <!-- 引用上述帧触发 -->
+                <FRAME-TRIGGERING-REF DEST="CAN-FRAME-TRIGGERING">/CANCommunication/VehicleCanNetwork/CAN-FRAME-PROCESSINGS/CanFrameProcessing/CAN-FRAME-TRIGGERINGS/EngineDataFrame</FRAME-TRIGGERING-REF>
+                <FRAME-TRIGGERING-REF DEST="CAN-FRAME-TRIGGERING">/CANCommunication/VehicleCanNetwork/CAN-FRAME-PROCESSINGS/CanFrameProcessing/CAN-FRAME-TRIGGERINGS/VehicleStatusFrame</FRAME-TRIGGERING-REF>
+              </FRAME-TRIGGERINGS>
+            </CAN-PHYSICAL-CHANNEL>
+          </PHYSICAL-CHANNELS>
+        </CAN-CLUSTER>
+
+        <!-- CAN 帧定义 -->
+        <CAN-FRAME>
+          <SHORT-NAME>EngineDataMessage</SHORT-NAME>
+          <FRAME-TYPE>STANDARD</FRAME-TYPE>
+          <CAN-ADDRESSING-MODE>NORMAL</CAN-ADDRESSING-MODE>
+          <FRAME-LENGTH>8</FRAME-LENGTH>
+          <MESSAGE-CAN-ID>
+            <CAN-ID>0x123</CAN-ID>
+          </MESSAGE-CAN-ID>
+          <PDU-TRIGGERING-REFS>
+            <PDU-TRIGGERING-REF DEST="PDU-TRIGGERING">/CANCommunication/VehicleCanNetwork/CAN-FRAME-PROCESSINGS/CanFrameProcessing/CAN-FRAME-TRIGGERINGS/EngineDataFrame/I-PDU-TRIGGERINGS/EngineDataIPDU</PDU-TRIGGERING-REF>
+          </PDU-TRIGGERING-REFS>
+        </CAN-FRAME>
+
+        <CAN-FRAME>
+          <SHORT-NAME>VehicleStatusMessage</SHORT-NAME>
+          <FRAME-TYPE>STANDARD</FRAME-TYPE>
+          <CAN-ADDRESSING-MODE>NORMAL</CAN-ADDRESSING-MODE>
+          <FRAME-LENGTH>8</FRAME-LENGTH>
+          <MESSAGE-CAN-ID>
+            <CAN-ID>0x456</CAN-ID>
+          </MESSAGE-CAN-ID>
+          <PDU-TRIGGERING-REFS>
+            <PDU-TRIGGERING-REF DEST="PDU-TRIGGERING">/CANCommunication/VehicleCanNetwork/CAN-FRAME-PROCESSINGS/CanFrameProcessing/CAN-FRAME-TRIGGERINGS/VehicleStatusFrame/I-PDU-TRIGGERINGS/VehicleStatusIPDU</PDU-TRIGGERING-REF>
+          </PDU-TRIGGERING-REFS>
+        </CAN-FRAME>
+
+        <!-- CAN 信号定义 -->
+        <I-SIGNAL>
+          <SHORT-NAME>EngineRPM_Signal</SHORT-NAME>
+          <SYSTEM-SIGNAL-REF DEST="SYSTEM-SIGNAL">/Communication/SystemSignals/EngineRPM_SystemSignal</SYSTEM-SIGNAL-REF>
+        </I-SIGNAL>
+
+        <I-SIGNAL>
+          <SHORT-NAME>EngineTemp_Signal</SHORT-NAME>
+          <SYSTEM-SIGNAL-REF DEST="SYSTEM-SIGNAL">/Communication/SystemSignals/EngineTemp_SystemSignal</SYSTEM-SIGNAL-REF>
+        </I-SIGNAL>
+
+        <I-SIGNAL>
+          <SHORT-NAME>ThrottlePos_Signal</SHORT-NAME>
+          <SYSTEM-SIGNAL-REF DEST="SYSTEM-SIGNAL">/Communication/SystemSignals/ThrottlePos_SystemSignal</SYSTEM-SIGNAL-REF>
+        </I-SIGNAL>
+
+        <I-SIGNAL>
+          <SHORT-NAME>VehicleSpeed_Signal</SHORT-NAME>
+          <SYSTEM-SIGNAL-REF DEST="SYSTEM-SIGNAL">/Communication/SystemSignals/VehicleSpeed_SystemSignal</SYSTEM-SIGNAL-REF>
+        </I-SIGNAL>
+
+        <I-SIGNAL>
+          <SHORT-NAME>BrakeStatus_Signal</SHORT-NAME>
+          <SYSTEM-SIGNAL-REF DEST="SYSTEM-SIGNAL">/Communication/SystemSignals/BrakeStatus_SystemSignal</SYSTEM-SIGNAL-REF>
+        </I-SIGNAL>
+
+        <I-SIGNAL>
+          <SHORT-NAME>SteeringAngle_Signal</SHORT-NAME>
+          <SYSTEM-SIGNAL-REF DEST="SYSTEM-SIGNAL">/Communication/SystemSignals/SteeringAngle_SystemSignal</SYSTEM-SIGNAL-REF>
+        </I-SIGNAL>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 系统信号包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>SystemSignals</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 发动机系统信号 -->
+        <SYSTEM-SIGNAL>
+          <SHORT-NAME>EngineRPM_SystemSignal</SHORT-NAME>
+          <PHYSICAL-PROPS>
+            <SW-DATA-DEF-PROPS>
+              <SW-DATA-DEF-PROPS-VARIANTS>
+                <SW-DATA-DEF-PROPS-CONDITIONAL>
+                  <BASE-TYPE-REF DEST="SW-BASE-TYPE">/CommDataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                  <SW-VALUE-CONT>800</SW-VALUE-CONT>
+                  <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                  <UPPER-LIMIT INTERVAL-TYPE="CLOSED">8000</UPPER-LIMIT>
+                </SW-DATA-DEF-PROPS-CONDITIONAL>
+              </SW-DATA-DEF-PROPS-VARIANTS>
+            </SW-DATA-DEF-PROPS>
+          </PHYSICAL-PROPS>
+        </SYSTEM-SIGNAL>
+
+        <SYSTEM-SIGNAL>
+          <SHORT-NAME>EngineTemp_SystemSignal</SHORT-NAME>
+          <PHYSICAL-PROPS>
+            <SW-DATA-DEF-PROPS>
+              <SW-DATA-DEF-PROPS-VARIANTS>
+                <SW-DATA-DEF-PROPS-CONDITIONAL>
+                  <BASE-TYPE-REF DEST="SW-BASE-TYPE">/CommDataTypes/SwBaseTypes/uint8</BASE-TYPE-REF>
+                  <SW-VALUE-CONT>90</SW-VALUE-CONT>
+                  <LOWER-LIMIT INTERVAL-TYPE="CLOSED">-40</LOWER-LIMIT>
+                  <UPPER-LIMIT INTERVAL-TYPE="CLOSED">150</UPPER-LIMIT>
+                </SW-DATA-DEF-PROPS-CONDITIONAL>
+              </SW-DATA-DEF-PROPS-VARIANTS>
+            </SW-DATA-DEF-PROPS>
+          </PHYSICAL-PROPS>
+        </SYSTEM-SIGNAL>
+
+        <SYSTEM-SIGNAL>
+          <SHORT-NAME>ThrottlePos_SystemSignal</SHORT-NAME>
+          <PHYSICAL-PROPS>
+            <SW-DATA-DEF-PROPS>
+              <SW-DATA-DEF-PROPS-VARIANTS>
+                <SW-DATA-DEF-PROPS-CONDITIONAL>
+                  <BASE-TYPE-REF DEST="SW-BASE-TYPE">/CommDataTypes/SwBaseTypes/uint8</BASE-TYPE-REF>
+                  <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                  <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                  <UPPER-LIMIT INTERVAL-TYPE="CLOSED">100</UPPER-LIMIT>
+                </SW-DATA-DEF-PROPS-CONDITIONAL>
+              </SW-DATA-DEF-PROPS-VARIANTS>
+            </SW-DATA-DEF-PROPS>
+          </PHYSICAL-PROPS>
+        </SYSTEM-SIGNAL>
+
+        <!-- 车辆状态系统信号 -->
+        <SYSTEM-SIGNAL>
+          <SHORT-NAME>VehicleSpeed_SystemSignal</SHORT-NAME>
+          <PHYSICAL-PROPS>
+            <SW-DATA-DEF-PROPS>
+              <SW-DATA-DEF-PROPS-VARIANTS>
+                <SW-DATA-DEF-PROPS-CONDITIONAL>
+                  <BASE-TYPE-REF DEST="SW-BASE-TYPE">/CommDataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                  <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                  <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                  <UPPER-LIMIT INTERVAL-TYPE="CLOSED">300</UPPER-LIMIT>
+                </SW-DATA-DEF-PROPS-CONDITIONAL>
+              </SW-DATA-DEF-PROPS-VARIANTS>
+            </SW-DATA-DEF-PROPS>
+          </PHYSICAL-PROPS>
+        </SYSTEM-SIGNAL>
+
+        <SYSTEM-SIGNAL>
+          <SHORT-NAME>BrakeStatus_SystemSignal</SHORT-NAME>
+          <PHYSICAL-PROPS>
+            <SW-DATA-DEF-PROPS>
+              <SW-DATA-DEF-PROPS-VARIANTS>
+                <SW-DATA-DEF-PROPS-CONDITIONAL>
+                  <BASE-TYPE-REF DEST="SW-BASE-TYPE">/CommDataTypes/SwBaseTypes/uint8</BASE-TYPE-REF>
+                  <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                  <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                  <UPPER-LIMIT INTERVAL-TYPE="CLOSED">255</UPPER-LIMIT>
+                </SW-DATA-DEF-PROPS-CONDITIONAL>
+              </SW-DATA-DEF-PROPS-VARIANTS>
+            </SW-DATA-DEF-PROPS>
+          </PHYSICAL-PROPS>
+        </SYSTEM-SIGNAL>
+
+        <SYSTEM-SIGNAL>
+          <SHORT-NAME>SteeringAngle_SystemSignal</SHORT-NAME>
+          <PHYSICAL-PROPS>
+            <SW-DATA-DEF-PROPS>
+              <SW-DATA-DEF-PROPS-VARIANTS>
+                <SW-DATA-DEF-PROPS-CONDITIONAL>
+                  <BASE-TYPE-REF DEST="SW-BASE-TYPE">/CommDataTypes/SwBaseTypes/int16</BASE-TYPE-REF>
+                  <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                  <LOWER-LIMIT INTERVAL-TYPE="CLOSED">-720</LOWER-LIMIT>
+                  <UPPER-LIMIT INTERVAL-TYPE="CLOSED">720</UPPER-LIMIT>
+                </SW-DATA-DEF-PROPS-CONDITIONAL>
+              </SW-DATA-DEF-PROPS-VARIANTS>
+            </SW-DATA-DEF-PROPS>
+          </PHYSICAL-PROPS>
+        </SYSTEM-SIGNAL>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 通信端口包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>Communication</SHORT-NAME>
+      <ELEMENTS>
+        <!-- CAN 端口定义 -->
+        <CAN-FRAME-PORT>
+          <SHORT-NAME>EngineDataFramePort</SHORT-NAME>
+        </CAN-FRAME-PORT>
+
+        <CAN-FRAME-PORT>
+          <SHORT-NAME>VehicleStatusFramePort</SHORT-NAME>
+        </CAN-FRAME-PORT>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+</AUTOSAR>

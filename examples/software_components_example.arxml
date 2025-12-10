@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  软件组件相关的 AUTOSAR 示例
+  包含应用软件组件、服务接口和内部行为定义
+-->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0" S="R4.0.3" T="2024-01-18T16:20:45Z">
+  <AR-PACKAGES>
+    <!-- 基础数据类型包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>BaseDataTypes</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 基础类型定义 -->
+        <SW-BASE-TYPE>
+          <SHORT-NAME>boolean</SHORT-NAME>
+          <CATEGORY>BOOLEAN</CATEGORY>
+        </SW-BASE-TYPE>
+
+        <SW-BASE-TYPE>
+          <SHORT-NAME>uint8</SHORT-NAME>
+          <CATEGORY>UNSIGNED_INTEGER</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">255</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </SW-BASE-TYPE>
+
+        <SW-BASE-TYPE>
+          <SHORT-NAME>uint16</SHORT-NAME>
+          <CATEGORY>UNSIGNED_INTEGER</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">65535</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </SW-BASE-TYPE>
+
+        <SW-BASE-TYPE>
+          <SHORT-NAME>int16</SHORT-NAME>
+          <CATEGORY>SIGNED_INTEGER</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">-32768</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">32767</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </SW-BASE-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 应用数据类型包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>AppDataTypes</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 温度数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>TemperatureType</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/BaseDataTypes/int16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>20</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">-50</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">150</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 速度数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>SpeedType</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/BaseDataTypes/uint16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">500</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 状态枚举类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>SystemStatusType</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/BaseDataTypes/uint8</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">3</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 接口包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>Interfaces</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 传感器数据接口 -->
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>SensorDataInterface</SHORT-NAME>
+          <DATA-ELEMENTS>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>TemperatureSensor</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/AppDataTypes/TemperatureType</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>SpeedSensor</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/AppDataTypes/SpeedType</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+          </DATA-ELEMENTS>
+        </SENDER-RECEIVER-INTERFACE>
+
+        <!-- 控制命令接口 -->
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>ControlCommandInterface</SHORT-NAME>
+          <DATA-ELEMENTS>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>MotorSpeedCommand</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/AppDataTypes/SpeedType</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>EnableCommand</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/BaseDataTypes/boolean</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+          </DATA-ELEMENTS>
+        </SENDER-RECEIVER-INTERFACE>
+
+        <!-- 系统状态接口 -->
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>SystemStatusInterface</SHORT-NAME>
+          <DATA-ELEMENTS>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>SystemStatus</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/AppDataTypes/SystemStatusType</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>ErrorCode</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/BaseDataTypes/uint16</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+          </DATA-ELEMENTS>
+        </SENDER-RECEIVER-INTERFACE>
+
+        <!-- 计算服务接口 -->
+        <CLIENT-SERVER-INTERFACE>
+          <SHORT-NAME>CalculationServiceInterface</SHORT-NAME>
+          <OPERATIONS>
+            <!-- 计算平均值服务 -->
+            <CLIENT-SERVER-OPERATION>
+              <SHORT-NAME>CalculateAverage</SHORT-NAME>
+              <ARGUMENTS>
+                <CLIENT-SERVER-ARGUMENT>
+                  <SHORT-NAME>Values</SHORT-NAME>
+                  <DIRECTION>IN</DIRECTION>
+                  <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/AppDataTypes/SpeedType</TYPE-TREF>
+                </CLIENT-SERVER-ARGUMENT>
+                <CLIENT-SERVER-ARGUMENT>
+                  <SHORT-NAME>Count</SHORT-NAME>
+                  <DIRECTION>IN</DIRECTION>
+                  <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/BaseDataTypes/uint8</TYPE-TREF>
+                </CLIENT-SERVER-ARGUMENT>
+                <CLIENT-SERVER-ARGUMENT>
+                  <SHORT-NAME>Average</SHORT-NAME>
+                  <DIRECTION>OUT</DIRECTION>
+                  <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/AppDataTypes/SpeedType</TYPE-TREF>
+                </CLIENT-SERVER-ARGUMENT>
+              </ARGUMENTS>
+            </CLIENT-SERVER-OPERATION>
+
+            <!-- 计算阈值检查服务 -->
+            <CLIENT-SERVER-OPERATION>
+              <SHORT-NAME>CheckThreshold</SHORT-NAME>
+              <ARGUMENTS>
+                <CLIENT-SERVER-ARGUMENT>
+                  <SHORT-NAME>Value</SHORT-NAME>
+                  <DIRECTION>IN</DIRECTION>
+                  <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/AppDataTypes/TemperatureType</TYPE-TREF>
+                </CLIENT-SERVER-ARGUMENT>
+                <CLIENT-SERVER-ARGUMENT>
+                  <SHORT-NAME>Threshold</SHORT-NAME>
+                  <DIRECTION>IN</DIRECTION>
+                  <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/AppDataTypes/TemperatureType</TYPE-TREF>
+                </CLIENT-SERVER-ARGUMENT>
+                <CLIENT-SERVER-ARGUMENT>
+                  <SHORT-NAME>IsExceeded</SHORT-NAME>
+                  <DIRECTION>OUT</DIRECTION>
+                  <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/BaseDataTypes/boolean</TYPE-TREF>
+                </CLIENT-SERVER-ARGUMENT>
+              </ARGUMENTS>
+            </CLIENT-SERVER-OPERATION>
+          </OPERATIONS>
+        </CLIENT-SERVER-INTERFACE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 应用软件组件包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>SoftwareComponents</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 传感器管理软件组件 -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>SensorManagerSWC</SHORT-NAME>
+          <PORTS>
+            <!-- 提供传感器数据 -->
+            <P-PORT-PROTOTYPE>
+              <SHORT-NAME>SensorDataPPort</SHORT-NAME>
+              <PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/SensorDataInterface</PROVIDED-INTERFACE-TREF>
+            </P-PORT-PROTOTYPE>
+
+            <!-- 提供系统状态 -->
+            <P-PORT-PROTOTYPE>
+              <SHORT-NAME>StatusPPort</SHORT-NAME>
+              <PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/SystemStatusInterface</PROVIDED-INTERFACE-TREF>
+            </P-PORT-PROTOTYPE>
+
+            <!-- 需要控制命令 -->
+            <R-PORT-PROTOTYPE>
+              <SHORT-NAME>ControlCommandRPort</SHORT-NAME>
+              <REQUIRED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/ControlCommandInterface</REQUIRED-INTERFACE-TREF>
+            </R-PORT-PROTOTYPE>
+          </PORTS>
+
+          <INTERNAL-BEHAVIORS>
+            <!-- 传感器管理实现 -->
+            <SWC-IMPLEMENTATION>
+              <SHORT-NAME>SensorManagerImplementation</SHORT-NAME>
+              <BEHAVIOR-REF DEST="SWC-INTERNAL-BEHAVIOR">/SoftwareComponents/SensorManagerBehavior</BEHAVIOR-REF>
+            </SWC-IMPLEMENTATION>
+
+            <!-- 传感器管理内部行为 -->
+            <SWC-INTERNAL-BEHAVIOR>
+              <SHORT-NAME>SensorManagerBehavior</SHORT-NAME>
+              <EVENTS>
+                <!-- 定时事件 - 传感器数据读取 -->
+                <TIMING-EVENT>
+                  <SHORT-NAME>ReadSensorDataEvent</SHORT-NAME>
+                  <START-ON-EVENT-REF DEST="RUNNABLE-ENTITY">/SoftwareComponents/SensorManagerBehavior/ReadSensorData</START-ON-EVENT-REF>
+                  <PERIOD>1000</PERIOD>
+                </TIMING-EVENT>
+
+                <!-- 数据发送完成事件 -->
+                <DATA-SEND-COMPLETED-EVENT>
+                  <SHORT-NAME>DataSendCompletedEvent</SHORT-NAME>
+                  <START-ON-EVENT-REF DEST="RUNNABLE-ENTITY">/SoftwareComponents/SensorManagerBehavior/ProcessSendComplete</START-ON-EVENT-REF>
+                  <DATA-IREF>
+                    <PORT-PROTOTYPE-REF DEST="P-PORT-PROTOTYPE">/SoftwareComponents/SensorManagerSWC/SensorDataPPort</PORT-PROTOTYPE-REF>
+                  </DATA-IREF>
+                </DATA-SEND-COMPLETED-EVENT>
+              </EVENTS>
+
+              <!-- 可运行实体 -->
+              <RUNNABLE-ENTITIES>
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>ReadSensorData</SHORT-NAME>
+                  <SYMBOL>ReadSensorData</SYMBOL>
+                </RUNNABLE-ENTITY>
+
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>ProcessSendComplete</SHORT-NAME>
+                  <SYMBOL>ProcessSendComplete</SYMBOL>
+                </RUNNABLE-ENTITY>
+
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>UpdateSystemStatus</SHORT-NAME>
+                  <SYMBOL>UpdateSystemStatus</SYMBOL>
+                </RUNNABLE-ENTITY>
+              </RUNNABLE-ENTITIES>
+            </SWC-INTERNAL-BEHAVIOR>
+          </INTERNAL-BEHAVIORS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+
+        <!-- 控制逻辑软件组件 -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>ControlLogicSWC</SHORT-NAME>
+          <PORTS>
+            <!-- 需要传感器数据 -->
+            <R-PORT-PROTOTYPE>
+              <SHORT-NAME>SensorDataRPort</SHORT-NAME>
+              <REQUIRED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/SensorDataInterface</REQUIRED-INTERFACE-TREF>
+            </R-PORT-PROTOTYPE>
+
+            <!-- 提供控制命令 -->
+            <P-PORT-PROTOTYPE>
+              <SHORT-NAME>ControlCommandPPort</SHORT-NAME>
+              <PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/ControlCommandInterface</PROVIDED-INTERFACE-TREF>
+            </P-PORT-PROTOTYPE>
+
+            <!-- 使用计算服务 -->
+            <R-PORT-PROTOTYPE>
+              <SHORT-NAME>CalculationServiceRPort</SHORT-NAME>
+              <REQUIRED-INTERFACE-TREF DEST="CLIENT-SERVER-INTERFACE">/Interfaces/CalculationServiceInterface</REQUIRED-INTERFACE-TREF>
+            </R-PORT-PROTOTYPE>
+          </PORTS>
+
+          <INTERNAL-BEHAVIORS>
+            <!-- 控制逻辑实现 -->
+            <SWC-IMPLEMENTATION>
+              <SHORT-NAME>ControlLogicImplementation</SHORT-NAME>
+              <BEHAVIOR-REF DEST="SWC-INTERNAL-BEHAVIOR">/SoftwareComponents/ControlLogicBehavior</BEHAVIOR-REF>
+            </SWC-IMPLEMENTATION>
+
+            <!-- 控制逻辑内部行为 -->
+            <SWC-INTERNAL-BEHAVIOR>
+              <SHORT-NAME>ControlLogicBehavior</SHORT-NAME>
+              <EVENTS>
+                <!-- 定时事件 - 控制逻辑执行 -->
+                <TIMING-EVENT>
+                  <SHORT-NAME>ExecuteControlLogicEvent</SHORT-NAME>
+                  <START-ON-EVENT-REF DEST="RUNNABLE-ENTITY">/SoftwareComponents/ControlLogicBehavior/ExecuteControlLogic</START-ON-EVENT-REF>
+                  <PERIOD>500</PERIOD>
+                </TIMING-EVENT>
+
+                <!-- 数据接收事件 -->
+                <DATA-RECEIVED-EVENT>
+                  <SHORT-NAME>DataReceivedEvent</SHORT-NAME>
+                  <START-ON-EVENT-REF DEST="RUNNABLE-ENTITY">/SoftwareComponents/ControlLogicBehavior/ProcessReceivedData</START-ON-EVENT-REF>
+                  <DATA-IREF>
+                    <PORT-PROTOTYPE-REF DEST="R-PORT-PROTOTYPE">/SoftwareComponents/ControlLogicSWC/SensorDataRPort</PORT-PROTOTYPE-REF>
+                  </DATA-IREF>
+                </DATA-RECEIVED-EVENT>
+              </EVENTS>
+
+              <!-- 可运行实体 -->
+              <RUNNABLE-ENTITIES>
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>ExecuteControlLogic</SHORT-NAME>
+                  <SYMBOL>ExecuteControlLogic</SYMBOL>
+                </RUNNABLE-ENTITY>
+
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>ProcessReceivedData</SHORT-NAME>
+                  <SYMBOL>ProcessReceivedData</SYMBOL>
+                </RUNNABLE-ENTITY>
+
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>CalculateControlOutput</SHORT-NAME>
+                  <SYMBOL>CalculateControlOutput</SYMBOL>
+                </RUNNABLE-ENTITY>
+              </RUNNABLE-ENTITIES>
+            </SWC-INTERNAL-BEHAVIOR>
+          </INTERNAL-BEHAVIORS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+
+        <!-- 数据处理软件组件 -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>DataProcessingSWC</SHORT-NAME>
+          <PORTS>
+            <!-- 需要传感器数据 -->
+            <R-PORT-PROTOTYPE>
+              <SHORT-NAME>SensorDataRPort</SHORT-NAME>
+              <REQUIRED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/SensorDataInterface</REQUIRED-INTERFACE-TREF>
+            </R-PORT-PROTOTYPE>
+
+            <!-- 需要控制命令 -->
+            <R-PORT-PROTOTYPE>
+              <SHORT-NAME>ControlCommandRPort</SHORT-NAME>
+              <REQUIRED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/ControlCommandInterface</REQUIRED-INTERFACE-TREF>
+            </R-PORT-PROTOTYPE>
+
+            <!-- 提供计算服务 -->
+            <P-PORT-PROTOTYPE>
+              <SHORT-NAME>CalculationServicePPort</SHORT-NAME>
+              <PROVIDED-INTERFACE-TREF DEST="CLIENT-SERVER-INTERFACE">/Interfaces/CalculationServiceInterface</PROVIDED-INTERFACE-TREF>
+            </P-PORT-PROTOTYPE>
+
+            <!-- 提供系统状态 -->
+            <P-PORT-PROTOTYPE>
+              <SHORT-NAME>StatusPPort</SHORT-NAME>
+              <PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/SystemStatusInterface</PROVIDED-INTERFACE-TREF>
+            </P-PORT-PROTOTYPE>
+          </PORTS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+</AUTOSAR>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  完整的 AUTOSAR 4.0.3 有效示例文件
+  包含基本系统、数据类型和软件组件定义
+-->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0" S="R4.0.3" T="2024-01-15T10:30:00Z">
+  <AR-PACKAGES>
+    <!-- 数据类型包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>DataTypes</SHORT-NAME>
+      <SHORT-NAME-PATTERN>DataType*</SHORT-NAME-PATTERN>
+      <ELEMENTS>
+        <!-- 车速数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>VehicleSpeedType</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/DataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">300</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- 发动机转速数据类型 -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>EngineRPMType</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+          <SW-DATA-DEF-PROPS>
+            <SW-DATA-DEF-PROPS-VARIANTS>
+              <SW-DATA-DEF-PROPS-CONDITIONAL>
+                <BASE-TYPE-REF DEST="SW-BASE-TYPE">/DataTypes/SwBaseTypes/uint16</BASE-TYPE-REF>
+                <SW-VALUE-CONT>0</SW-VALUE-CONT>
+                <LOWER-LIMIT INTERVAL-TYPE="CLOSED">0</LOWER-LIMIT>
+                <UPPER-LIMIT INTERVAL-TYPE="CLOSED">8000</UPPER-LIMIT>
+              </SW-DATA-DEF-PROPS-CONDITIONAL>
+            </SW-DATA-DEF-PROPS-VARIANTS>
+          </SW-DATA-DEF-PROPS>
+        </IMPLEMENTATION-DATA-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 系统包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>VehicleSystem</SHORT-NAME>
+      <ELEMENTS>
+        <SYSTEM>
+          <SHORT-NAME>VehicleControlSystem</SHORT-NAME>
+          <CATEGORY>SYSTEM</CATEGORY>
+          <COMPONENTS>
+            <COMPONENT-REF DEST="APPLICATION-SOFTWARE-COMPONENT">
+              <SHORT-NAME>EngineControlSWC</SHORT-NAME>
+            </COMPONENT-REF>
+            <COMPONENT-REF DEST="APPLICATION-SOFTWARE-COMPONENT">
+              <SHORT-NAME>DisplaySWC</SHORT-NAME>
+            </COMPONENT-REF>
+          </COMPONENTS>
+        </SYSTEM>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 应用软件组件包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>SoftwareComponents</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 发动机控制软件组件 -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>EngineControlSWC</SHORT-NAME>
+          <PORTS>
+            <!-- 提供者端口 - 提供发动机数据 -->
+            <P-PORT-PROTOTYPE>
+              <SHORT-NAME>EngineDataPPort</SHORT-NAME>
+              <PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/EngineDataInterface</PROVIDED-INTERFACE-TREF>
+            </P-PORT-PROTOTYPE>
+          </PORTS>
+          <INTERNAL-BEHAVIORS>
+            <!-- 内部行为 -->
+            <SWC-IMPLEMENTATION>
+              <SHORT-NAME>EngineControlImplementation</SHORT-NAME>
+              <BEHAVIOR-REF DEST="SWC-INTERNAL-BEHAVIOR">/SoftwareComponents/EngineControlBehavior</BEHAVIOR-REF>
+            </SWC-IMPLEMENTATION>
+          </INTERNAL-BEHAVIORS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+
+        <!-- 显示软件组件 -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>DisplaySWC</SHORT-NAME>
+          <PORTS>
+            <!-- 需求者端口 - 需要发动机数据 -->
+            <R-PORT-PROTOTYPE>
+              <SHORT-NAME>DisplayDataRPort</SHORT-NAME>
+              <REQUIRED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/EngineDataInterface</REQUIRED-INTERFACE-TREF>
+            </R-PORT-PROTOTYPE>
+          </PORTS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 接口包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>Interfaces</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 发动机数据接口 -->
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>EngineDataInterface</SHORT-NAME>
+          <DATA-ELEMENTS>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>VehicleSpeed</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/DataTypes/VehicleSpeedType</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+            <VARIABLE-DATA-PROTOTYPE>
+              <SHORT-NAME>EngineRPM</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/DataTypes/EngineRPMType</TYPE-TREF>
+            </VARIABLE-DATA-PROTOTYPE>
+          </DATA-ELEMENTS>
+        </SENDER-RECEIVER-INTERFACE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- 映射包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>Mappings</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 系统映射 -->
+        <SYSTEM-MAPPING>
+          <SHORT-NAME>VehicleSystemMapping</SHORT-NAME>
+          <SYSTEM-REF DEST="SYSTEM">/VehicleSystem/VehicleControlSystem</SYSTEM-REF>
+          <SWC-TO-ECU-MAPPINGS>
+            <SWC-TO-ECU-MAPPING>
+              <SHORT-NAME>EngineSWCMapping</SHORT-NAME>
+              <SWC-INSTANCE-REF DEST="APPLICATION-SOFTWARE-COMPONENT">/SoftwareComponents/EngineControlSWC</SWC-INSTANCE-REF>
+              <ECU-INSTANCE-REF DEST="ECU-INSTANCE">/ECUs/EngineECU</ECU-INSTANCE-REF>
+            </SWC-TO-ECU-MAPPING>
+            <SWC-TO-ECU-MAPPING>
+              <SHORT-NAME>DisplaySWCMapping</SHORT-NAME>
+              <SWC-INSTANCE-REF DEST="APPLICATION-SOFTWARE-COMPONENT">/SoftwareComponents/DisplaySWC</SWC-INSTANCE-REF>
+              <ECU-INSTANCE-REF DEST="ECU-INSTANCE">/ECUs/DisplayECU</ECU-INSTANCE-REF>
+            </SWC-TO-ECU-MAPPING>
+          </SWC-TO-ECU-MAPPINGS>
+        </SYSTEM-MAPPING>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- ECU 包 -->
+    <AR-PACKAGE>
+      <SHORT-NAME>ECUs</SHORT-NAME>
+      <ELEMENTS>
+        <!-- 发动机 ECU -->
+        <ECU-INSTANCE>
+          <SHORT-NAME>EngineECU</SHORT-NAME>
+          <CATEGORY>ECU</CATEGORY>
+        </ECU-INSTANCE>
+
+        <!-- 显示 ECU -->
+        <ECU-INSTANCE>
+          <SHORT-NAME>DisplayECU</SHORT-NAME>
+          <CATEGORY>ECU</CATEGORY>
+        </ECU-INSTANCE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+</AUTOSAR>

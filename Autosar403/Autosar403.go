@@ -1,6 +1,15 @@
 // Autosar403 project Autosar403.go
 package Autosar403
 
+import (
+	"encoding/xml"
+	"fmt"
+	"io"
+	"os"
+	"regexp"
+	"strings"
+)
+
 type FLEXRAY_PHYSICAL_CHANNEL__SUBTYPES_ENUM string
 
 type REFERRABLE__SUBTYPES_ENUM string
@@ -18040,4 +18049,297 @@ type LATENCY_CONSTRAINT_TYPE_ENUM struct {
 	Text string          `xml:",innerxml"`
 	S    *STRING__SIMPLE `xml:"S,attr"`
 	T    *DATE__SIMPLE   `xml:"T,attr"`
+}
+
+// ========== 解析和验证功能 ==========
+
+// ValidationError 表示验证错误
+type ValidationError struct {
+	Level     string // "ERROR", "WARNING", "INFO"
+	Message   string
+	Element   string // 出错元素的路径
+	Context   string // 上下文信息
+}
+
+// ValidationResult 验证结果
+type ValidationResult struct {
+	Valid    bool
+	Errors   []ValidationError
+	Warnings []ValidationError
+	Info     []ValidationError
+}
+
+// ParseArxmlFile 从文件路径解析 ARXML 文件
+func ParseArxmlFile(filePath string) (*AUTOSAR, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("无法打开文件: %v", err)
+	}
+	defer file.Close()
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return nil, fmt.Errorf("无法读取文件: %v", err)
+	}
+
+	return ParseArxmlData(data)
+}
+
+// ParseArxmlData 从字节数据解析 ARXML
+func ParseArxmlData(data []byte) (*AUTOSAR, error) {
+	var autosar AUTOSAR
+
+	// 移除可能的 BOM 标记
+	if len(data) >= 3 && data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF {
+		data = data[3:]
+	}
+
+	decoder := xml.NewDecoder(strings.NewReader(string(data)))
+	decoder.Strict = false
+	decoder.AutoClose = xml.HTMLAutoClose
+
+	err := decoder.Decode(&autosar)
+	if err != nil {
+		return nil, fmt.Errorf("XML 解析失败: %v", err)
+	}
+
+	return &autosar, nil
+}
+
+// ValidateArxml 验证 ARXML 数据
+func ValidateArxml(autosar *AUTOSAR) *ValidationResult {
+	result := &ValidationResult{
+		Valid:    true,
+		Errors:   []ValidationError{},
+		Warnings: []ValidationError{},
+		Info:     []ValidationError{},
+	}
+
+	// 验证根级别结构
+	if autosar == nil {
+		result.Errors = append(result.Errors, ValidationError{
+			Level:   "ERROR",
+			Message: "ARXML 数据为空",
+			Element: "AUTOSAR",
+		})
+		result.Valid = false
+		return result
+	}
+
+	// 验证 S 属性（命名空间）
+	if autosar.S == nil || *autosar.S == "" {
+		result.Errors = append(result.Errors, ValidationError{
+			Level:   "ERROR",
+			Message: "AUTOSAR 缺少必需的 S 属性（命名空间）",
+			Element: "AUTOSAR",
+		})
+		result.Valid = false
+	}
+
+	// 验证时间戳
+	if autosar.T == nil {
+		result.Warnings = append(result.Warnings, ValidationError{
+			Level:   "WARNING",
+			Message: "AUTOSAR 缺少时间戳 T 属性",
+			Element: "AUTOSAR",
+		})
+	}
+
+	// 验证 AR-PACKAGES
+	if autosar.ArPackages == nil || len(autosar.ArPackages.ArPackage) == 0 {
+		result.Warnings = append(result.Warnings, ValidationError{
+			Level:   "WARNING",
+			Message: "ARXML 不包含任何 AR-PACKAGE",
+			Element: "AR-PACKAGES",
+		})
+		return result
+	}
+
+	// 验证每个 AR-PACKAGE
+	for i, pkg := range autosar.ArPackages.ArPackage {
+		validateArPackage(&pkg, fmt.Sprintf("AR-PACKAGES/AR-PACKAGE[%d]", i), result)
+	}
+
+	return result
+}
+
+// validateArPackage 验证单个 AR-PACKAGE
+func validateArPackage(pkg *AR_PACKAGE, path string, result *ValidationResult) {
+	// 验证 SHORT-NAME
+	if pkg.ShortName.Text == "" {
+		result.Errors = append(result.Errors, ValidationError{
+			Level:   "ERROR",
+			Message: "AR-PACKAGE 缺少必需的 SHORT-NAME",
+			Element: path + "/SHORT-NAME",
+		})
+		result.Valid = false
+	} else {
+		// 验证 SHORT-NAME 格式
+		if !isValidIdentifier(pkg.ShortName.Text) {
+			result.Errors = append(result.Errors, ValidationError{
+				Level:   "ERROR",
+				Message: fmt.Sprintf("无效的 SHORT-NAME 格式: %s", pkg.ShortName.Text),
+				Element: path + "/SHORT-NAME",
+				Context: "SHORT-NAME 必须以字母开头，只能包含字母、数字和下划线",
+			})
+			result.Valid = false
+		}
+	}
+
+	// 验证 SHORT-NAME-PATTERN（如果存在）
+	if pkg.ShortNamePattern != nil && pkg.ShortNamePattern.Text != "" {
+		if !isValidIdentifierPattern(pkg.ShortNamePattern.Text) {
+			result.Warnings = append(result.Warnings, ValidationError{
+				Level:   "WARNING",
+				Message: fmt.Sprintf("可能无效的 SHORT-NAME-PATTERN: %s", pkg.ShortNamePattern.Text),
+				Element: path + "/SHORT-NAME-PATTERN",
+			})
+		}
+	}
+
+	// 验证 Elements 中的元素
+	if pkg.Elements != nil {
+		validateElements(pkg.Elements, path+"/ELEMENTS", result)
+	}
+}
+
+// validateElements 验证 Elements 中的各种元素
+// 这是一个基础验证框架，可以根据需要扩展
+func validateElements(elements interface{}, path string, result *ValidationResult) {
+	// 基础验证：检查元素是否为空
+	if elements == nil {
+		result.Info = append(result.Info, ValidationError{
+			Level:   "INFO",
+			Message: "Elements 为空，跳过验证",
+			Element: path,
+		})
+	}
+}
+
+// validateShortName 验证 SHORT-NAME 字段的通用函数
+func validateShortName(shortName IDENTIFIER, path string, elementName string, result *ValidationResult) bool {
+	if shortName.Text == "" {
+		result.Errors = append(result.Errors, ValidationError{
+			Level:   "ERROR",
+			Message: fmt.Sprintf("%s 缺少必需的 SHORT-NAME", elementName),
+			Element: path + "/SHORT-NAME",
+		})
+		return false
+	}
+
+	// 验证 SHORT-NAME 格式
+	if !isValidIdentifier(shortName.Text) {
+		result.Errors = append(result.Errors, ValidationError{
+			Level:   "ERROR",
+			Message: fmt.Sprintf("无效的 SHORT-NAME 格式: %s", shortName.Text),
+			Element: path + "/SHORT-NAME",
+			Context: "SHORT-NAME 必须以字母开头，只能包含字母、数字和下划线",
+		})
+		return false
+	}
+
+	return true
+}
+
+// validateReference 验证引用字段
+func validateReference(dest string, path string, refName string, result *ValidationResult) bool {
+	if dest == "" {
+		result.Errors = append(result.Errors, ValidationError{
+			Level:   "ERROR",
+			Message: fmt.Sprintf("%s 缺少必需的 Dest 属性", refName),
+			Element: path,
+		})
+		return false
+	}
+	return true
+}
+
+// isValidIdentifier 检查标识符是否有效
+func isValidIdentifier(name string) bool {
+	if name == "" {
+		return false
+	}
+
+	// AUTOSAR 标识符规则：以字母开头，可包含字母、数字、下划线
+	match, _ := regexp.MatchString(`^[a-zA-Z][a-zA-Z0-9_]*$`, name)
+	return match
+}
+
+// isValidIdentifierPattern 检查标识符模式是否有效
+func isValidIdentifierPattern(pattern string) bool {
+	if pattern == "" {
+		return false
+	}
+
+	// 简单的验证，实际可能需要更复杂的模式验证
+	return strings.Contains(pattern, "*") || strings.Contains(pattern, "?") || isValidIdentifier(pattern)
+}
+
+// PrintValidationResult 打印验证结果
+func (vr *ValidationResult) PrintValidationResult() {
+	fmt.Printf("=== ARXML 验证结果 ===\n")
+	fmt.Printf("状态: %s\n\n", func() string {
+		if vr.Valid {
+			return "✓ 有效"
+		}
+		return "✗ 无效"
+	}())
+
+	if len(vr.Errors) > 0 {
+		fmt.Printf("错误 (%d):\n", len(vr.Errors))
+		for _, err := range vr.Errors {
+			fmt.Printf("  ❌ [%s] %s\n", err.Element, err.Message)
+			if err.Context != "" {
+				fmt.Printf("     上下文: %s\n", err.Context)
+			}
+		}
+		fmt.Println()
+	}
+
+	if len(vr.Warnings) > 0 {
+		fmt.Printf("警告 (%d):\n", len(vr.Warnings))
+		for _, warn := range vr.Warnings {
+			fmt.Printf("  ⚠️  [%s] %s\n", warn.Element, warn.Message)
+			if warn.Context != "" {
+				fmt.Printf("     上下文: %s\n", warn.Context)
+			}
+		}
+		fmt.Println()
+	}
+
+	if len(vr.Info) > 0 {
+		fmt.Printf("信息 (%d):\n", len(vr.Info))
+		for _, info := range vr.Info {
+			fmt.Printf("  ℹ️  [%s] %s\n", info.Element, info.Message)
+			if info.Context != "" {
+				fmt.Printf("     上下文: %s\n", info.Context)
+			}
+		}
+		fmt.Println()
+	}
+}
+
+// HasErrors 检查是否有错误
+func (vr *ValidationResult) HasErrors() bool {
+	return len(vr.Errors) > 0
+}
+
+// HasWarnings 检查是否有警告
+func (vr *ValidationResult) HasWarnings() bool {
+	return len(vr.Warnings) > 0
+}
+
+// GetErrorCount 获取错误数量
+func (vr *ValidationResult) GetErrorCount() int {
+	return len(vr.Errors)
+}
+
+// GetWarningCount 获取警告数量
+func (vr *ValidationResult) GetWarningCount() int {
+	return len(vr.Warnings)
+}
+
+// GetInfoCount 获取信息数量
+func (vr *ValidationResult) GetInfoCount() int {
+	return len(vr.Info)
 }
