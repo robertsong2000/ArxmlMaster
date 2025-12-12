@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"regexp"
 	"strings"
 )
@@ -18204,7 +18205,6 @@ func validateArPackage(pkg *AR_PACKAGE, path string, result *ValidationResult) {
 }
 
 // validateElements 验证 Elements 中的各种元素
-// 这是一个基础验证框架，可以根据需要扩展
 func validateElements(elements interface{}, path string, result *ValidationResult) {
 	// 基础验证：检查元素是否为空
 	if elements == nil {
@@ -18213,6 +18213,268 @@ func validateElements(elements interface{}, path string, result *ValidationResul
 			Message: "Elements 为空，跳过验证",
 			Element: path,
 		})
+		return
+	}
+
+	// 收集所有名称用于重复检查
+	allNames := make(map[string]string)
+
+	// 使用反射来访问Elements结构
+	val := reflect.ValueOf(elements)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+
+	if val.Kind() != reflect.Struct {
+		result.Warnings = append(result.Warnings, ValidationError{
+			Level:   "WARNING",
+			Message: "无法解析Elements结构，跳过详细验证",
+			Element: path,
+		})
+		return
+	}
+
+	// 遍历所有字段
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Field(i)
+		fieldType := val.Type().Field(i)
+
+		// 检查字段是否为切片类型
+		if field.Kind() != reflect.Slice {
+			continue
+		}
+
+		// 获取字段名称（去掉XML标签）
+		fieldName := fieldType.Name
+		xmlTag := fieldType.Tag.Get("xml")
+		if xmlTag != "" {
+			parts := strings.Split(xmlTag, ",")
+			if len(parts) > 0 {
+				fieldName = parts[0]
+			}
+		}
+
+		// 验证切片中的每个元素
+		for j := 0; j < field.Len(); j++ {
+			element := field.Index(j)
+			if element.Kind() == reflect.Ptr {
+				if element.IsNil() {
+					continue
+				}
+				element = element.Elem()
+			}
+
+			elementPath := fmt.Sprintf("%s/%s[%d]", path, fieldName, j)
+			validateElementByType(element, fieldName, elementPath, result, allNames)
+		}
+	}
+}
+
+// validateElementByType 根据元素类型进行验证
+func validateElementByType(element reflect.Value, elementName string, elementPath string, result *ValidationResult, allNames map[string]string) {
+	// 尝试获取SHORT-NAME字段
+	shortNameField := element.FieldByName("ShortName")
+	var shortNameText string
+
+	if shortNameField.IsValid() {
+		// ShortName是IDENTIFIER类型，包含Text字段
+		textField := shortNameField.FieldByName("Text")
+		if textField.IsValid() {
+			shortNameText = textField.String()
+		}
+	}
+
+	// 如果没有SHORT-NAME，这是一个错误
+	if shortNameText == "" {
+		result.Errors = append(result.Errors, ValidationError{
+			Level:   "ERROR",
+			Message: fmt.Sprintf("%s 缺少必需的 SHORT-NAME", elementName),
+			Element: elementPath + "/SHORT-NAME",
+		})
+		result.Valid = false
+		return
+	}
+
+	// 验证SHORT-NAME格式
+	if !isValidIdentifier(shortNameText) {
+		result.Errors = append(result.Errors, ValidationError{
+			Level:   "ERROR",
+			Message: fmt.Sprintf("无效的 SHORT-NAME 格式: %s", shortNameText),
+			Element: elementPath + "/SHORT-NAME",
+			Context: "SHORT-NAME 必须以字母开头，只能包含字母、数字和下划线",
+		})
+		result.Valid = false
+		return
+	}
+
+	// 检查重复名称
+	checkDuplicateName(shortNameText, elementName, elementPath, &allNames, result)
+
+	// 根据元素类型进行特定验证
+	switch elementName {
+	case "IMPLEMENTATION-DATA-TYPE":
+		validateImplementationDataTypeSpecific(element, elementPath, result)
+	case "SENDER-RECEIVER-INTERFACE":
+		validateSenderReceiverInterfaceSpecific(element, elementPath, result)
+	case "APPLICATION-SW-COMPONENT-TYPE":
+		validateApplicationSwComponentTypeSpecific(element, elementPath, result)
+	}
+}
+
+// validateImplementationDataTypeSpecific 验证实现数据类型特定字段
+func validateImplementationDataTypeSpecific(element reflect.Value, elementPath string, result *ValidationResult) {
+	// 验证CATEGORY字段
+	categoryField := element.FieldByName("Category")
+	if !categoryField.IsValid() || categoryField.IsNil() {
+		result.Warnings = append(result.Warnings, ValidationError{
+			Level:   "WARNING",
+			Message: "IMPLEMENTATION-DATA-TYPE 缺少 CATEGORY",
+			Element: elementPath + "/CATEGORY",
+		})
+		return
+	}
+
+	// 获取CATEGORY的Text值
+	categoryText := ""
+	if categoryField.Kind() == reflect.Ptr {
+		if !categoryField.IsNil() {
+			categoryText = categoryField.Elem().FieldByName("Text").String()
+		}
+	} else {
+		categoryText = categoryField.FieldByName("Text").String()
+	}
+
+	// 验证CATEGORY值
+	if categoryText != "" {
+		validCategories := []string{"VALUE", "TYPE_REFERENCE", "STRUCTURE", "UNION", "ARRAY"}
+		validCategory := false
+		for _, cat := range validCategories {
+			if categoryText == cat {
+				validCategory = true
+				break
+			}
+		}
+		if !validCategory {
+			result.Errors = append(result.Errors, ValidationError{
+				Level:   "ERROR",
+				Message: fmt.Sprintf("无效的 CATEGORY: %s", categoryText),
+				Element: elementPath + "/CATEGORY",
+				Context: "CATEGORY 必须是以下之一: VALUE, TYPE_REFERENCE, STRUCTURE, UNION, ARRAY",
+			})
+			result.Valid = false
+		}
+	}
+}
+
+// validateSenderReceiverInterfaceSpecific 验证发送接收接口特定字段
+func validateSenderReceiverInterfaceSpecific(element reflect.Value, elementPath string, result *ValidationResult) {
+	// 验证DATA-ELEMENTS
+	dataElementsField := element.FieldByName("DataElements")
+	if dataElementsField.IsValid() && !dataElementsField.IsNil() {
+		// 检查是否有VariableDataPrototype
+		variableDataField := dataElementsField.Elem().FieldByName("VariableDataPrototype")
+		if variableDataField.IsValid() && variableDataField.Len() == 0 {
+			result.Warnings = append(result.Warnings, ValidationError{
+				Level:   "WARNING",
+				Message: "SENDER-RECEIVER-INTERFACE 不包含任何数据元素",
+				Element: elementPath + "/DATA-ELEMENTS",
+			})
+		}
+	}
+}
+
+// validateApplicationSwComponentTypeSpecific 验证应用软件组件类型特定字段
+func validateApplicationSwComponentTypeSpecific(element reflect.Value, elementPath string, result *ValidationResult) {
+	// 验证PORTS
+	portsField := element.FieldByName("Ports")
+	if portsField.IsValid() && !portsField.IsNil() {
+		ports := portsField.Elem()
+
+		// 验证客户端服务端口
+		clientServerPorts := ports.FieldByName("ClientServerPort")
+		if clientServerPorts.IsValid() {
+			for i := 0; i < clientServerPorts.Len(); i++ {
+				port := clientServerPorts.Index(i)
+				if port.Kind() == reflect.Ptr {
+					port = port.Elem()
+				}
+				portPath := fmt.Sprintf("%s/CLIENT-SERVER-PORT[%d]", elementPath, i)
+
+				// 验证端口的SHORT-NAME
+				shortNameField := port.FieldByName("ShortName")
+				if shortNameField.IsValid() {
+					shortNameText := shortNameField.FieldByName("Text").String()
+					if !isValidIdentifier(shortNameText) {
+						result.Errors = append(result.Errors, ValidationError{
+							Level:   "ERROR",
+							Message: fmt.Sprintf("无效的端口 SHORT-NAME: %s", shortNameText),
+							Element: portPath + "/SHORT-NAME",
+						})
+						result.Valid = false
+					}
+				}
+
+				// 验证RequiredProvidedInterfaceRef的Dest属性
+				refField := port.FieldByName("RequiredProvidedInterfaceRef")
+				if refField.IsValid() && !refField.IsNil() {
+					destField := refField.Elem().FieldByName("Dest")
+					if destField.IsValid() {
+						destText := destField.String()
+						if destText == "" {
+							result.Errors = append(result.Errors, ValidationError{
+								Level:   "ERROR",
+								Message: "CLIENT-SERVER-PORT 缺少必需的 Dest 属性",
+								Element: portPath + "/REQUIRED-PROVIDED-INTERFACE-REF",
+							})
+							result.Valid = false
+						}
+					}
+				}
+			}
+		}
+
+		// 验证发送接收端口
+		senderReceiverPorts := ports.FieldByName("SenderReceiverPort")
+		if senderReceiverPorts.IsValid() {
+			for i := 0; i < senderReceiverPorts.Len(); i++ {
+				port := senderReceiverPorts.Index(i)
+				if port.Kind() == reflect.Ptr {
+					port = port.Elem()
+				}
+				portPath := fmt.Sprintf("%s/SENDER-RECEIVER-PORT[%d]", elementPath, i)
+
+				// 验证端口的SHORT-NAME
+				shortNameField := port.FieldByName("ShortName")
+				if shortNameField.IsValid() {
+					shortNameText := shortNameField.FieldByName("Text").String()
+					if !isValidIdentifier(shortNameText) {
+						result.Errors = append(result.Errors, ValidationError{
+							Level:   "ERROR",
+							Message: fmt.Sprintf("无效的端口 SHORT-NAME: %s", shortNameText),
+							Element: portPath + "/SHORT-NAME",
+						})
+						result.Valid = false
+					}
+				}
+
+				// 验证RequiredInterfaceRef的Dest属性
+				refField := port.FieldByName("RequiredInterfaceRef")
+				if refField.IsValid() && !refField.IsNil() {
+					destField := refField.Elem().FieldByName("Dest")
+					if destField.IsValid() {
+						destText := destField.String()
+						if destText == "" {
+							result.Errors = append(result.Errors, ValidationError{
+								Level:   "ERROR",
+								Message: "SENDER-RECEIVER-PORT 缺少必需的 Dest 属性",
+								Element: portPath + "/REQUIRED-INTERFACE-REF",
+							})
+							result.Valid = false
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -18343,3 +18605,138 @@ func (vr *ValidationResult) GetWarningCount() int {
 func (vr *ValidationResult) GetInfoCount() int {
 	return len(vr.Info)
 }
+
+// checkDuplicateName 检查重复名称
+func checkDuplicateName(name string, elementType string, path string, allNames *map[string]string, result *ValidationResult) {
+	if existingType, exists := (*allNames)[name]; exists {
+		result.Errors = append(result.Errors, ValidationError{
+			Level:   "ERROR",
+			Message: fmt.Sprintf("重复的 SHORT-NAME '%s'，与现有的 %s 冲突", name, existingType),
+			Element: path,
+			Context: "每个元素在同一作用域内必须有唯一的 SHORT-NAME",
+		})
+		result.Valid = false
+	} else {
+		(*allNames)[name] = elementType
+	}
+}
+
+// validateApplicationSwComponentType 验证应用软件组件类型
+func validateApplicationSwComponentType(component *APPLICATION_SW_COMPONENT_TYPE, basePath string, index int, result *ValidationResult, allNames map[string]string) {
+	elementPath := fmt.Sprintf("%s/APPLICATION-SW-COMPONENT-TYPE[%d]", basePath, index)
+
+	// 验证 SHORT-NAME
+	if !validateShortName(component.ShortName, elementPath, "APPLICATION-SW-COMPONENT-TYPE", result) {
+		result.Valid = false
+		return
+	}
+
+	// 检查重复名称
+	checkDuplicateName(component.ShortName.Text, "APPLICATION-SW-COMPONENT-TYPE", elementPath, &allNames, result)
+
+	// 验证端口
+	if component.Ports != nil {
+		// 端口验证将在validateApplicationSwComponentTypeSpecific中通过反射处理
+	}
+}
+
+// validateImplementationDataType 验证实现数据类型
+func validateImplementationDataType(datatype *IMPLEMENTATION_DATA_TYPE, basePath string, index int, result *ValidationResult, allNames map[string]string) {
+	elementPath := fmt.Sprintf("%s/IMPLEMENTATION-DATA-TYPE[%d]", basePath, index)
+
+	// 验证 SHORT-NAME
+	if !validateShortName(datatype.ShortName, elementPath, "IMPLEMENTATION-DATA-TYPE", result) {
+		result.Valid = false
+		return
+	}
+
+	// 检查重复名称
+	checkDuplicateName(datatype.ShortName.Text, "IMPLEMENTATION-DATA-TYPE", elementPath, &allNames, result)
+
+	// 验证 CATEGORY（如果存在）
+	if datatype.Category != nil {
+		validCategories := []string{"VALUE", "TYPE_REFERENCE", "STRUCTURE", "UNION", "ARRAY"}
+		validCategory := false
+		for _, cat := range validCategories {
+			if datatype.Category.Text == cat {
+				validCategory = true
+				break
+			}
+		}
+		if !validCategory {
+			result.Errors = append(result.Errors, ValidationError{
+				Level:   "ERROR",
+				Message: fmt.Sprintf("无效的 CATEGORY: %s", datatype.Category.Text),
+				Element: elementPath + "/CATEGORY",
+				Context: "CATEGORY 必须是以下之一: VALUE, TYPE_REFERENCE, STRUCTURE, UNION, ARRAY",
+			})
+			result.Valid = false
+		}
+	}
+}
+
+// validateSenderReceiverInterface 验证发送接收接口
+func validateSenderReceiverInterface(iface *SENDER_RECEIVER_INTERFACE, basePath string, index int, result *ValidationResult, allNames map[string]string) {
+	elementPath := fmt.Sprintf("%s/SENDER-RECEIVER-INTERFACE[%d]", basePath, index)
+
+	// 验证 SHORT-NAME
+	if !validateShortName(iface.ShortName, elementPath, "SENDER-RECEIVER-INTERFACE", result) {
+		result.Valid = false
+		return
+	}
+
+	// 检查重复名称
+	checkDuplicateName(iface.ShortName.Text, "SENDER-RECEIVER-INTERFACE", elementPath, &allNames, result)
+
+	// 验证数据元素
+	if iface.DataElements != nil && len(iface.DataElements.VariableDataPrototype) == 0 {
+		result.Warnings = append(result.Warnings, ValidationError{
+			Level:   "WARNING",
+			Message: "SENDER-RECEIVER-INTERFACE 不包含任何数据元素",
+			Element: elementPath + "/DATA-ELEMENTS",
+		})
+	}
+}
+
+// validateClientServerInterface 验证客户端服务端接口
+func validateClientServerInterface(iface *CLIENT_SERVER_INTERFACE, basePath string, index int, result *ValidationResult, allNames map[string]string) {
+	elementPath := fmt.Sprintf("%s/CLIENT-SERVER-INTERFACE[%d]", basePath, index)
+
+	// 验证 SHORT-NAME
+	if !validateShortName(iface.ShortName, elementPath, "CLIENT-SERVER-INTERFACE", result) {
+		result.Valid = false
+		return
+	}
+
+	// 检查重复名称
+	checkDuplicateName(iface.ShortName.Text, "CLIENT-SERVER-INTERFACE", elementPath, &allNames, result)
+}
+
+// validateCompositionSwComponentType 验证组合软件组件类型
+func validateCompositionSwComponentType(component *COMPOSITION_SW_COMPONENT_TYPE, basePath string, index int, result *ValidationResult, allNames map[string]string) {
+	elementPath := fmt.Sprintf("%s/COMPOSITION-SW-COMPONENT-TYPE[%d]", basePath, index)
+
+	// 验证 SHORT-NAME
+	if !validateShortName(component.ShortName, elementPath, "COMPOSITION-SW-COMPONENT-TYPE", result) {
+		result.Valid = false
+		return
+	}
+
+	// 检查重复名称
+	checkDuplicateName(component.ShortName.Text, "COMPOSITION-SW-COMPONENT-TYPE", elementPath, &allNames, result)
+}
+
+// validateSwBaseType 验证软件基础类型
+func validateSwBaseType(baseType *SW_BASE_TYPE, basePath string, index int, result *ValidationResult, allNames map[string]string) {
+	elementPath := fmt.Sprintf("%s/SW-BASE-TYPE[%d]", basePath, index)
+
+	// 验证 SHORT-NAME
+	if !validateShortName(baseType.ShortName, elementPath, "SW-BASE-TYPE", result) {
+		result.Valid = false
+		return
+	}
+
+	// 检查重复名称
+	checkDuplicateName(baseType.ShortName.Text, "SW-BASE-TYPE", elementPath, &allNames, result)
+}
+

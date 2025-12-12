@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file contains various errors for testing ARXML parser validation -->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0">
+  <AR-PACKAGES>
+    <!-- Missing AR-PACKAGE opening tag -->
+    <AR-PACKAGE>
+      <SHORT-NAME>ValidPackage</SHORT-NAME>
+      <ELEMENTS>
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>ValidComponent</SHORT-NAME>
+          <PORTS>
+            <RECEIVER-PORT>
+              <SHORT-NAME>ValidReceiverPort</SHORT-NAME>
+              <REQUIRED-INTERFACE-REF DEST="SENDER-RECEIVER-INTERFACE">/ValidPackage/ValidInterface</REQUIRED-INTERFACE-REF>
+            </RECEIVER-PORT>
+          </PORTS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>ValidInterface</SHORT-NAME>
+          <DATA-ELEMENTS>
+            <DATA-ELEMENT>
+              <SHORT-NAME>ValidDataElement</SHORT-NAME>
+              <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/ValidPackage/ValidDataType</TYPE-TREF>
+            </DATA-ELEMENT>
+          </DATA-ELEMENTS>
+        </SENDER-RECEIVER-INTERFACE>
+
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>ValidDataType</SHORT-NAME>
+          <CATEGORY>VALUE</CATEGORY>
+        </IMPLEMENTATION-DATA-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- Package with various naming violations -->
+    <AR-PACKAGE>
+      <SHORT-NAME>123InvalidStartWithNumber</SHORT-NAME>
+      <ELEMENTS>
+        <!-- Missing SHORT-NAME -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <PORTS/>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+
+        <!-- Invalid SHORT-NAME with special characters -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>Invalid@Name#With$Special%Chars</SHORT-NAME>
+          <PORTS/>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+
+        <!-- SHORT-NAME too long -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>ThisIsAnExtremelyLongComponentNameThatExceedsTheMaximumAllowedLengthForAUTOSARIdentifiersAndShouldTriggerAValidationErro</SHORT-NAME>
+          <PORTS/>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+
+        <!-- Empty SHORT-NAME -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME></SHORT-NAME>
+          <PORTS/>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+
+        <!-- Duplicate names within same scope -->
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>DuplicateInterface</SHORT-NAME>
+        </SENDER-RECEIVER-INTERFACE>
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>DuplicateInterface</SHORT-NAME>
+        </SENDER-RECEIVER-INTERFACE>
+
+        <!-- Invalid data type category -->
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>InvalidType</SHORT-NAME>
+          <CATEGORY>INVALID_CATEGORY</CATEGORY>
+        </IMPLEMENTATION-DATA-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- Package with reference errors -->
+    <AR-PACKAGE>
+      <SHORT-NAME>RefErrorsPackage</SHORT-NAME>
+      <ELEMENTS>
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>ComponentWithBadRefs</SHORT-NAME>
+          <PORTS>
+            <RECEIVER-PORT>
+              <SHORT-NAME>PortWithBadRef</SHORT-NAME>
+              <!-- Invalid reference format -->
+              <REQUIRED-INTERFACE-REF DEST="SENDER-RECEIVER-INTERFACE">InvalidReferenceFormat</REQUIRED-INTERFACE-REF>
+            </RECEIVER-PORT>
+            <RECEIVER-PORT>
+              <SHORT-NAME>PortWithMissingRef</SHORT-NAME>
+              <!-- Missing required reference -->
+            </RECEIVER-PORT>
+            <RECEIVER-PORT>
+              <SHORT-NAME>PortWithWrongDest</SHORT-NAME>
+              <!-- Wrong DEST attribute -->
+              <REQUIRED-INTERFACE-REF DEST="WRONG-DESTINATION">/ValidPackage/ValidInterface</REQUIRED-INTERFACE-REF>
+            </RECEIVER-PORT>
+          </PORTS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- Package with invalid XML structure -->
+    <AR-PACKAGE>
+      <SHORT-NAME>StructureErrorsPackage</SHORT-NAME>
+      <ELEMENTS>
+        <!-- Unclosed tag -->
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>UnclosedTag</SHORT-NAME>
+          <PORTS>
+        <!-- Missing closing tags above -->
+
+        <!-- Mismatched tags -->
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>MismatchedTag</SHORT-NAME>
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <!-- Invalid element placement -->
+        <SHORT-NAME>OrphanedShortName</SHORT-NAME>
+        <INVALID-ELEMENT>
+          <SHORT-NAME>InvalidElement</SHORT-NAME>
+        </INVALID-ELEMENT>
+      </ELEMENTS>
+    </AR-PACKAGE>
+
+    <!-- Package with validation rule violations -->
+    <AR-PACKAGE>
+      <SHORT-NAME>RuleViolationPackage</SHORT-NAME>
+      <ELEMENTS>
+        <SENDER-RECEIVER-INTERFACE>
+          <SHORT-NAME>EmptyInterface</SHORT-NAME>
+          <!-- Empty DATA-ELEMENTS when interface should have data -->
+          <DATA-ELEMENTS/>
+        </SENDER-RECEIVER-INTERFACE>
+
+        <IMPLEMENTATION-DATA-TYPE>
+          <SHORT-NAME>TypeWithoutCategory</SHORT-NAME>
+          <!-- Missing required CATEGORY element -->
+        </IMPLEMENTATION-DATA-TYPE>
+
+        <APPLICATION-SOFTWARE-COMPONENT-TYPE>
+          <SHORT-NAME>ComponentWithInvalidPort</SHORT-NAME>
+          <PORTS>
+            <RECEIVER-PORT>
+              <!-- Missing SHORT-NAME for port -->
+              <REQUIRED-INTERFACE-REF DEST="SENDER-RECEIVER-INTERFACE">/ValidPackage/ValidInterface</REQUIRED-INTERFACE-REF>
+            </RECEIVER-PORT>
+          </PORTS>
+        </APPLICATION-SOFTWARE-COMPONENT-TYPE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+
+  <!-- Content outside proper structure -->
+  <SHORT-NAME>OrphanedElement</SHORT-NAME>
+  <INVALID-ROOT-ELEMENT>
+    <SHORT-NAME>InvalidAtRoot</SHORT-NAME>
+  </INVALID-ROOT-ELEMENT>
+</AUTOSAR>
+<!-- Extra content after closing root tag -->
+<ELEMENT-AFTER-ROOT>
+  <SHORT-NAME>AfterRoot</SHORT-NAME>
+</ELEMENT-AFTER-ROOT>
